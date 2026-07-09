@@ -6,5 +6,8 @@ __pycache__/
 # CatBoost training scratch
 catboost_info/
 
+# Auto-sync runtime log (written by auto_sync.bat)
+auto_sync.log
+
 # NOTE: load_pred_v2~v7 archives and model artifacts (*.txt / *.pkl)
 # are intentionally kept in the repo per project decision.
