@@ -1,0 +1,11 @@
+building ...
+  n_feat=126  usable=75840
+  hyperparams: nl=255 mdl=200 l2=4.0 lam=1.0  seeds=3  (no per-hour bias)
+== best_iter ษจร่ (no-bias) ==
+  BI=  80: no-bias VAL MAE=1530.82
+  BI= 117: no-bias VAL MAE=1543.64
+  BI= 142: no-bias VAL MAE=1547.50
+  BI= 175: no-bias VAL MAE=1550.42
+  BI= 220: no-bias VAL MAE=1550.80
+  BI= 280: no-bias VAL MAE=1549.55
+done.

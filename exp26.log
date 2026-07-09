@@ -1,0 +1,24 @@
+== (a) day_level features ==
+[baseline          ] VAL MAE=1569.48  n_feat=77
+[+ day_level feats ] VAL MAE=1575.33  n_feat=91
+  mo=3: base=1606.76 +dl=1587.01
+  mo=4: base=1420.95 +dl=1424.72
+  mo=5: base=1598.02 +dl=1615.57
+  mo=6: base=1730.54 +dl=1769.26
+
+== (b) per-(hour,dow) correction ==
+[+ per-hour        ] VAL MAE=1578.14
+[+ per-(h,dow)     ] VAL MAE=1579.74
+[+ per-(h,mo)      ] VAL MAE=1684.05
+
+== (c) prediction capping ==
+  error: |e| p50=867 p90=4068 p99=8546 max=15597
+[cap pl¡À10%] VAL MAE=1575.33
+[cap pl¡À15%] VAL MAE=1575.33
+[cap pl¡À20%] VAL MAE=1575.33
+[cap pl¡À30%] VAL MAE=1575.33
+[cap pl¡À15% + per-hour] VAL MAE=1578.14
+[cap pl¡À20% + per-hour] VAL MAE=1578.14
+
+== best combo ==
+[day_level + per-hour + cap¡À20%] VAL MAE=1578.14

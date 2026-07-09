@@ -1,0 +1,60 @@
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-835, 682]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0869)), (12, np.float64(-0.092)), (13, np.float64(-0.0729)), (14, np.float64(-0.0639))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1089.0
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-266.2
+基线=1493.66
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+
+=== 时段×温度带（冷<8 / 热>28）校正 ===
+  晨6-10 冷<8: shift=-898 n_v=409 Δ=-6.62 (累计1487.04)
+  午11-14 冷<8: shift=-1888 n_v=145 Δ=-9.22 (累计1477.82)
+  晚15-20 冷<8: shift=-695 n_v=300 Δ=-4.43 (累计1473.39)
+  晚15-20 热>28: shift=-512 n_v=200 Δ=+3.23 (累计1476.62)
+  夜21-5 冷<8: shift=-142 n_v=838 Δ=-4.12 (累计1469.27)
+  → 时段×温度组合 MAE=1469.27 Δ=-24.39
+
+=== 清洁组合 ===
+  +temp<8@全天: shift=-616 n_v=1692 → MAE=1475.24 Δ=-18.42
+  +clr0.2-0.5@11-14: shift=-2536 n_v=218 → MAE=1477.24 Δ=-16.42
+  +irrad<400@9-15: shift=-994 n_v=571 → MAE=1481.45 Δ=-12.21
+  +temp<5@全天: shift=-835 n_v=1144 → MAE=1481.43 Δ=-12.23
+  +temp>30@全天: shift=+231 n_v=207 → MAE=1491.96 Δ=-1.70
+  贪心清洁:
+    +temp<8@全天 shift=-616 n_v=1692 Δ=-18.42 累计=1475.24
+    +clr0.2-0.5@11-14 shift=-2536 n_v=218 Δ=-16.42 累计=1458.82
+    +irrad<400@9-15 shift=-994 n_v=571 Δ=-2.12 累计=1456.70
+    +temp>30@全天 shift=+231 n_v=207 Δ=-1.70 累计=1455.00
+    +temp>30@全天 shift=+231 n_v=207 Δ=-1.39 累计=1453.61
+    +temp>30@全天 shift=+231 n_v=207 Δ=-1.00 累计=1452.61
+  → 清洁贪心 MAE=1452.61 Δ=-41.05
+
+=== 天气不确定性(_std) ===
+  使用 w_光伏_温度_std: 范围[0.00,5.87]
+  w_光伏_温度_std>2.52: shift=+348 n_v=3223 MAE=1506.98 Δ=+13.32
+  w_光伏_温度_std>3.09: shift=+68 n_v=1066 MAE=1493.76 Δ=+0.10

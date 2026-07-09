@@ -1,0 +1,68 @@
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-835, 682]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0869)), (12, np.float64(-0.092)), (13, np.float64(-0.0729)), (14, np.float64(-0.0639))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1089.0
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-266.2
+基线(生产) = 1493.66
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+
+=== 单 pocket（@9-15 / @11-14, ×1.0 与 ×0.7）===
+            pocket    hrs  shrink   oof_sh   n_v       MAE        Δ
+       clr 0.2-0.5   9-15     1.0  -1896.2   396   1480.10   -13.56
+       clr 0.2-0.5   9-15     0.7  -1327.3   396   1482.02   -11.64
+       clr 0.2-0.5  11-14     1.0  -2536.3   218   1477.24   -16.42
+       clr 0.2-0.5  11-14     0.7  -1775.4   218   1479.79   -13.87
+       clr 0.5-0.8   9-15     1.0    701.1  1292   1499.46    +5.81
+       clr 0.5-0.8   9-15     0.7    490.7  1292   1495.60    +1.94
+       clr 0.5-0.8  11-14     1.0    550.4   635   1492.19    -1.46
+       clr 0.5-0.8  11-14     0.7    385.3   635   1491.90    -1.76
+         clr >=0.8   9-15     1.0    489.7  1148   1496.09    +2.43
+         clr >=0.8   9-15     0.7    342.8  1148   1494.46    +0.80
+         clr >=0.8  11-14     1.0    325.3   766   1494.44    +0.78
+         clr >=0.8  11-14     0.7    227.7   766   1493.89    +0.23
+        irrad>=800   9-15     1.0  -1360.3   468   1496.92    +3.26
+        irrad>=800   9-15     0.7   -952.2   468   1494.42    +0.76
+        irrad>=800  11-14     1.0   -124.6   427   1493.37    -0.28
+        irrad>=800  11-14     0.7    -87.2   427   1493.45    -0.20
+     irrad 400-800   9-15     1.0   1113.5  1957   1516.68   +23.02
+     irrad 400-800   9-15     0.7    779.4  1957   1503.07    +9.41
+     irrad 400-800  11-14     1.0    673.9  1011   1494.10    +0.45
+     irrad 400-800  11-14     0.7    471.7  1011   1492.42    -1.24
+     irrad 100-400   9-15     1.0  -1266.1   481   1485.98    -7.68
+     irrad 100-400   9-15     0.7   -886.3   481   1486.46    -7.20
+     irrad 100-400  11-14     1.0  -1978.3   226   1482.21   -11.45
+     irrad 100-400  11-14     0.7  -1384.8   226   1483.79    -9.87
+
+=== 组合（基于现有 >0.8×0.7 + 新增）===
+               +clr0.2-0.5×0.7 MAE=1482.02  Δ=-11.64
+               +clr0.5-0.8×0.7 MAE=1495.60  Δ=+1.94
+               +irrad>=800×0.7 MAE=1494.42  Δ=+0.76
+             +irrad400-800×0.7 MAE=1503.07  Δ=+9.41
+       +clr0.2-0.5+0.5-0.8×0.7 MAE=1483.96  Δ=-9.69
+                     +all4×0.7 MAE=1505.77  Δ=+12.11
+                     +all4×1.0 MAE=1533.19  Δ=+39.53

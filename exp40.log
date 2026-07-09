@@ -1,0 +1,16 @@
+building ...
+  (mismatch b=8.1854)
+  (b_cs=4.0801)
+  n_feat=120
+
+=== val 午间 方向相关性 ===
+  pl_weather_residual    corr=+0.3395  (n=1284)
+  solar_mismatch_cs      corr=-0.1143  (n=1284)
+  solar_mismatch_hour    corr=-0.2111  (n=1248)
+  pl_dip_ratio           corr=-0.0699  (n=1284)
+  solar_mismatch         corr=-0.1784  (n=1248)
+
+training final ensemble ...
+  no-bias:   VAL MAE=1539.56
+  +per-hour: VAL MAE=1531.80
+  午间 MAE=3183.36  非午间 MAE=1295.86

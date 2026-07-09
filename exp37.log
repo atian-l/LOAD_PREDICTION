@@ -1,0 +1,30 @@
+E:\01\python\SdPproject\load_prediction\load_pred\exp36.py:61: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_x_midday"] = ir_clean * X["is_midday"].values
+E:\01\python\SdPproject\load_prediction\load_pred\exp36.py:62: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_x_midday"] = pl * ir_clean * X["is_midday"].values
+E:\01\python\SdPproject\load_prediction\load_pred\exp36.py:63: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * X["is_midday"].values
+building ...
+  n_feat=103
+training final CatBoost ensemble (16 members) ...
+  no-bias:   VAL MAE=1561.57
+training single-fold OOF (winter) for per-hour bias ...
+  +per-hour: VAL MAE=1589.12
+
+=== 场景分解（CatBoost +per-hour）===
+  all                     : n=10272 MAE=1589.1 bias=+387.8
+  午间11-13                 : n= 1284 MAE=3309.6 bias=+590.6
+  非午间                     : n= 8988 MAE=1343.3 bias=+358.8
+  白天8-16                  : n= 3852 MAE=2875.0 bias=+978.6
+  白天多云                    : n=  567 MAE=3864.4 bias=+1292.4
+  白天晴                     : n= 3285 MAE=2704.2 bias=+924.4
+  午间&多云                   : n=  191 MAE=4662.7 bias=+727.1
+  --- 按小时 MAE top8 ---
+    h=13 n= 428 MAE=3347.9
+    h=12 n= 428 MAE=3337.1
+    h=11 n= 428 MAE=3243.7
+    h= 9 n= 428 MAE=3123.2
+    h=10 n= 428 MAE=3111.6
+    h=14 n= 428 MAE=3025.7
+    h= 8 n= 428 MAE=2528.6
+    h=15 n= 428 MAE=2408.7

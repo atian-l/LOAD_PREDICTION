@@ -1,0 +1,16 @@
+﻿,perm_mae_increase
+pred_load,7342.0807
+pred_load_lag_96,16.0378
+irrad_range,11.0998
+pred_load_diff_96,6.9043
+doy_cos,2.2570
+pl_wr_roll_std_672,2.1347
+pl_wr_diff_96,1.0929
+pred_load_lag_288,0.8710
+dayofyear,-0.6063
+pl_wr_x_is_daytime,-0.7204
+pl_x_temp,-1.1798
+pred_load_lag_192,-1.4117
+pred_load_roll_mean_672,-2.1435
+pred_load_roll_mean_96,-2.3913
+pred_load_vs_mean_672,-6.2640

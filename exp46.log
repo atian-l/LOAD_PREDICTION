@@ -1,0 +1,8 @@
+building ...
+  n_feat=126  usable=75840
+== +per-hour ≈‰÷√…®√Ë (BI=80, 3 seeds) ==
+  nl=127 mdl=300 l2=2.0 lam=0.9: no-bias=1534.60  +per-hour=1534.95  (delta=+0.35)
+  nl=127 mdl=200 l2=2.0 lam=1.0: no-bias=1532.19  +per-hour=1528.70  (delta=-3.49)
+  nl=127 mdl=200 l2=4.0 lam=0.9: no-bias=1532.24  +per-hour=1529.96  (delta=-2.29)
+  nl=255 mdl=200 l2=4.0 lam=1.0: no-bias=1530.82  +per-hour=1526.86  (delta=-3.95)
+done.

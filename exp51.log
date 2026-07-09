@@ -1,0 +1,6 @@
+building baseline ...
+  baseline (Œﬁ÷Õ∫Û): n_feat=126  MAE=1513.80
+building +pl_wr lags ...
+  +pl_wr_lag(96/288/672)+x_lag96: n_feat=130  MAE=1516.86
+  delta=+3.06
+done.

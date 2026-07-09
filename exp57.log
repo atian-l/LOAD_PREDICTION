@@ -1,0 +1,20 @@
+LGB 3-seed full ensemble ...
+      集成成员数: 40
+  LGB raw val MAE = 1528.74
+CB 3-seed full ensemble ...
+  CB  raw val MAE = 1550.71
+  误差相关性 corr(LGB,CB) = 0.9861
+
+  blend w(LGB)=0.30: raw val MAE = 1538.76
+  blend w(LGB)=0.40: raw val MAE = 1535.58
+  blend w(LGB)=0.50: raw val MAE = 1533.06
+  blend w(LGB)=0.60: raw val MAE = 1531.00
+  blend w(LGB)=0.70: raw val MAE = 1529.54
+  blend w(LGB)=0.80: raw val MAE = 1528.61  <- best
+  blend w(LGB)=0.85: raw val MAE = 1528.40  <- best
+  blend w(LGB)=0.90: raw val MAE = 1528.37  <- best
+  blend w(LGB)=0.95: raw val MAE = 1528.48
+
+  best raw blend: w(LGB)=0.90 -> 1528.37  (LGB raw=1528.74)
+
+raw blend 不优于 LGB raw -> 混合无收益，跳过校正。

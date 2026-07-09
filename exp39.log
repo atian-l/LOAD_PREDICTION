@@ -1,0 +1,16 @@
+building ...
+  (mismatch b=8.1854)
+  n_feat=112
+
+=== val 午间(11-13) 方向相关性 corr(feature, pred_load_err) ===
+  pl_dip_96          corr=-0.1154  (n=1284)
+  irrad_anom_672     corr=+0.0622  (n=1236)
+  solar_mismatch     corr=-0.1784  (n=1248)
+  irrad              corr=+0.0625  (n=1248)
+  clearness          corr=+0.1360  (n=1248)
+  (负相关=该特征大时 pred_load 偏高估；正相关=偏低估)
+
+training final ensemble ...
+  no-bias:   VAL MAE=1541.69
+  +per-hour: VAL MAE=1537.58
+  午间 MAE=3192.08  非午间 MAE=1301.23

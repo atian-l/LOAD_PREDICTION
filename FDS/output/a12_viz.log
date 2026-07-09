@@ -1,0 +1,6 @@
+== (十二) 拟合能力可视化 ==
+  [fig] 12_pred_vs_actual.png
+  [fig] 12_error_timeseries.png
+案例日: worst=2026-05-20 MAE=5880, best=2026-04-01 MAE=322, peak_err=2026-04-13, peak_load=2026-03-05 (87885 MW)
+  [fig] 12_case_days.png
+  [fig] 12_two_week_detail.png

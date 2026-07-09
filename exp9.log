@@ -1,0 +1,8 @@
+building ...
+[base              ] best_it=290 n=20  VAL MAE=1537.43  R2=0.9476  Bias=-221
+[q045_05_055       ] best_it=290 n=40  VAL MAE=1532.11  R2=0.9476  Bias=-215
+[seeds8            ] best_it=290 n=32  VAL MAE=1538.10  R2=0.9476  Bias=-222
+[aw2.5             ] best_it=283 n=20  VAL MAE=1536.00  R2=0.9476  Bias=-215
+[aw2.5_q3          ] best_it=283 n=40  VAL MAE=1531.46  R2=0.9476  Bias=-206
+[aw2.5_md200_l159  ] best_it=295 n=20  VAL MAE=1541.96  R2=0.9476  Bias=-227
+[aw3.0             ] best_it=283 n=20  VAL MAE=1536.36  R2=0.9476  Bias=-210

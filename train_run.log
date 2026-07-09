@@ -1,0 +1,54 @@
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+[1/6] 读取数据并构造特征 ...
+      特征数: 126  可训练点: 75840  [2023/02/01 00:00:00 ~ 2026/06/15 23:45:00]
+[2/6] walk-forward 3 折确定 best_iter ...
+      (使用固定 best_it_fixed=80；walk-forward 已禁用)
+      各折 best_iter=[]  -> 平均 80
+[3/6] 训练 LightGBM 集成 ...
+      集成成员数: 40
+[3.5/6] 计算 OOF 每小时偏置校正 + 漂移方向校正 + 阈值场景校正 ...
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-835, 682]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0869)), (12, np.float64(-0.092)), (13, np.float64(-0.0729)), (14, np.float64(-0.0639))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1089.0
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-266.2
+[4/6] 全量推理 ...
+[5/6] 写出 full_predictions.csv / full_mae.csv ...
+[6/6] 计算官方验证集指标并保存模型 ...
+
+================ 验证集评估 ================
+  MAE: 1493.6575846962617
+  RMSE: 2353.4022282790957
+  R2: 0.9242339582499065
+  MAPE(%): 2.4950515011322674
+  Bias: -104.42199279595017
+  MAE_q50: 832.9549999999945
+  MAE_q90: 3777.6389999999938
+  MAE_q95: 5300.712499999981
+  MAE_q99: 8728.355300000001
+  N_points: 10272
+  val_start: 2026/03/01 00:00:00
+  val_end: 2026/06/15 23:45:00
+==========================================
+模型已保存: E:\01\python\SdPproject\load_prediction\models\model_bundle.pkl

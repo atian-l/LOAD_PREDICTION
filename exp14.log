@@ -1,0 +1,62 @@
+building ...
+best_it=252
+VAL MAE=1523.86 Bias=-143.0
+
+=== 模型残差与各特征 corr (val) ===
+pred_load_diff_96          0.128
+pred_load_lag_672          0.115
+pred_load                  0.102
+pred_load_vs_mean_96       0.102
+pred_load_roll_mean_672    0.100
+month_cos                  0.093
+pred_load_lag_288          0.092
+month                      0.090
+dow_cos                    0.088
+pred_load_ramp_48          0.083
+pred_load_roll_std_96      0.080
+doy_cos                    0.080
+dayofyear                  0.079
+temp_sq                    0.077
+doy_sin                    0.072
+temp_x_daylight            0.066
+cdd_x_hour                 0.066
+cdd                        0.065
+pred_load_lag_192          0.062
+w_风电_风速_p50                0.057
+wind                       0.057
+w_风电_风速_p75                0.055
+w_光伏_温度                    0.054
+w_风电_风速_p25                0.053
+w_光伏_温度_p75                0.053
+
+=== 模型残差 by hour (mean/std/mae) ===
+  h= 0: bias=   -125 std=   700 mae=   539 n=432
+  h= 2: bias=    -82 std=   647 mae=   507 n=432
+  h= 4: bias=     43 std=   693 mae=   525 n=432
+  h= 6: bias=     54 std=  1024 mae=   777 n=432
+  h= 8: bias=   -544 std=  2627 mae=  2007 n=432
+  h=10: bias=    -62 std=  4012 mae=  2967 n=432
+  h=12: bias=    130 std=  4440 mae=  3446 n=428
+  h=14: bias=   -464 std=  3687 mae=  2887 n=428
+  h=16: bias=   -942 std=  2032 mae=  1848 n=428
+  h=18: bias=    168 std=  1190 mae=   933 n=428
+  h=20: bias=     49 std=  1138 mae=   858 n=428
+  h=22: bias=   -133 std=  1238 mae=   943 n=428
+
+=== 模型残差 by month ===
+  mo=2: bias=    360 std=  2091 mae=  1490 n=2688
+  mo=3: bias=   -371 std=  2478 mae=  1585 n=2976
+  mo=4: bias=   -273 std=  2344 mae=  1420 n=2880
+  mo=5: bias=   -310 std=  2628 mae=  1641 n=1776
+
+=== 模型残差 by pred_load quartile ===
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "E:\01\python\SdPproject\load_prediction\load_pred\exp14.py", line 113, in <module>
+    main()
+    ~~~~^^
+  File "E:\01\python\SdPproject\load_prediction\load_pred\exp14.py", line 107, in main
+    m = (q == lab).values
+        ^^^^^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'values'

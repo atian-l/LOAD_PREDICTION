@@ -1,0 +1,45 @@
+== (十一) 特征贡献 ==
+基线 MAE=1445.62  特征数=126
+  [tbl] 11_gain_importance.csv
+Gain Top10:
+ pred_load                 4.963728e+13
+pred_load_lag_96          6.719705e+12
+pred_load_diff_96         8.999687e+11
+pred_load_lag_192         8.318701e+11
+pred_load_vs_mean_672     1.608497e+11
+pred_load_roll_mean_96    1.593151e+11
+pl_x_temp                 1.294681e+11
+pred_load_lag_288         1.183551e+11
+dayofyear                 1.159362e+11
+doy_cos                   1.159109e+11
+  [tbl] 11_shap_importance.csv
+SHAP Top10:
+ pred_load            2624.0
+pred_load_lag_96      377.7
+pred_load_diff_96     168.5
+irrad_range           114.4
+mod_cos                83.4
+pred_load_lag_192      72.9
+hour_cos               65.4
+pl_x_hour              63.8
+pl_x_irrad_anom        55.4
+pred_load_lag_672      48.6
+  [tbl] 11_permutation_importance.csv
+置换重要性 Top(全管线, MAE上升):
+ pred_load                  7342.1
+pred_load_lag_96             16.0
+irrad_range                  11.1
+pred_load_diff_96             6.9
+doy_cos                       2.3
+pl_wr_roll_std_672            2.1
+pl_wr_diff_96                 1.1
+pred_load_lag_288             0.9
+dayofyear                    -0.6
+pl_wr_x_is_daytime           -0.7
+pl_x_temp                    -1.2
+pred_load_lag_192            -1.4
+pred_load_roll_mean_672      -2.1
+pred_load_roll_mean_96       -2.4
+pred_load_vs_mean_672        -6.3
+  [fig] 11_pdp_ice.png
+  [fig] 11_importance_compare.png

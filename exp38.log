@@ -1,0 +1,22 @@
+E:\01\python\SdPproject\load_prediction\load_pred\exp36.py:61: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_x_midday"] = ir_clean * X["is_midday"].values
+E:\01\python\SdPproject\load_prediction\load_pred\exp36.py:62: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_x_midday"] = pl * ir_clean * X["is_midday"].values
+E:\01\python\SdPproject\load_prediction\load_pred\exp36.py:63: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * X["is_midday"].values
+building ...
+training final ensemble ...
+  no-bias:        VAL MAE=1551.15
+  +per-hour:      VAL MAE=1547.47
+
+  --- 各场景 OOF 残差均值(训练期) vs VAL 偏置 ---
+    夜        tr_n=14343 tr_bias=    +0.0  val_n=6420 val_bias=  -135.7
+    白天晴      tr_n= 4196 tr_bias=  +343.3  val_n=2098 val_bias=  -402.2
+    白天多云     tr_n= 1540 tr_bias=  -935.3  val_n= 470 val_bias=  +279.8
+    午间晴      tr_n= 2393 tr_bias=  +254.5  val_n=1092 val_bias=  -130.2
+    午间多云     tr_n=  475 tr_bias= -1282.0  val_n= 192 val_bias=   -75.1
+
+  +scenario-bias: VAL MAE=1569.75
+  +midday-cloudy-bias: VAL MAE=1549.80
+  +cloud-deficit-reg(b=-0.7891): VAL MAE=nan
+  +scenario+mid-cloud-reg: VAL MAE=nan

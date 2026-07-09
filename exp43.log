@@ -1,0 +1,29 @@
+building ...
+  (mismatch b=8.1854)
+  (b_cs=4.0801)
+  n_feat=128
+=== val 全天方向相关性 ===
+  pl_wr_diff_672         corr=+0.1644 (n=10272)
+  pl_wr_diff_96          corr=+0.1462 (n=10272)
+  pl_weather_residual    corr=+0.2926 (n=10272)
+
+== baseline (nl=127 lr=0.03 mdl=300 l2=2.0 λ=0.9) ==
+  no-bias: VAL MAE=1527.35
+
+== 超参扫描 (no-bias) ==
+  nl=127 mdl=200 l2=2.0 λ0.9: no-bias MAE=1524.36
+  nl=127 mdl=200 l2=2.0 λ1.0: no-bias MAE=1523.41
+  nl=127 mdl=200 l2=4.0 λ0.9: no-bias MAE=1525.77
+  nl=127 mdl=200 l2=4.0 λ1.0: no-bias MAE=1524.58
+  nl=127 mdl=300 l2=2.0 λ0.9: no-bias MAE=1527.35
+  nl=127 mdl=300 l2=2.0 λ1.0: no-bias MAE=1526.41
+  nl=127 mdl=300 l2=4.0 λ0.9: no-bias MAE=1526.11
+  nl=127 mdl=300 l2=4.0 λ1.0: no-bias MAE=1525.38
+  nl=255 mdl=200 l2=2.0 λ0.9: no-bias MAE=1527.36
+  nl=255 mdl=200 l2=2.0 λ1.0: no-bias MAE=1527.21
+  nl=255 mdl=200 l2=4.0 λ0.9: no-bias MAE=1523.20
+  nl=255 mdl=200 l2=4.0 λ1.0: no-bias MAE=1522.80
+  nl=255 mdl=300 l2=2.0 λ0.9: no-bias MAE=1528.05
+  nl=255 mdl=300 l2=2.0 λ1.0: no-bias MAE=1527.39
+  nl=255 mdl=300 l2=4.0 λ0.9: no-bias MAE=1527.68
+  nl=255 mdl=300 l2=4.0 λ1.0: no-bias MAE=1527.01

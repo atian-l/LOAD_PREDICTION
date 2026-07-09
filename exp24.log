@@ -1,0 +1,59 @@
+C:\Users\atian\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3460754382893008e-23.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+C:\Users\atian\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3546848659850213e-22.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+C:\Users\atian\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3559737332826986e-21.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+building ...
+training full ensemble ...
+[baseline] VAL MAE=1569.48
+
+== Jan-Feb year-over-year drift ==
+per-hour Jan-Feb 2025 vs 2026 bias:
+  h= 0: b25=-224 b26=-112 drift=112
+  h= 1: b25=-167 b26=-52 drift=115
+  h= 2: b25=-400 b26=-253 drift=147
+  h= 3: b25=-261 b26=18 drift=279
+  h= 4: b25=-178 b26=83 drift=260
+  h= 5: b25=-141 b26=113 drift=254
+  h= 6: b25=158 b26=306 drift=148
+  h= 7: b25=296 b26=-385 drift=-681
+  h= 8: b25=-337 b26=-1541 drift=-1204
+  h= 9: b25=-1353 b26=-1945 drift=-592
+  h=10: b25=-1683 b26=-1707 drift=-24
+  h=11: b25=-1816 b26=-1265 drift=550
+  h=12: b25=-1815 b26=-758 drift=1057
+  h=13: b25=-1869 b26=-1151 drift=718
+  h=14: b25=-1593 b26=-1728 drift=-135
+  h=15: b25=-862 b26=-2107 drift=-1245
+  h=16: b25=-118 b26=-1482 drift=-1365
+  h=17: b25=-256 b26=-21 drift=235
+  h=18: b25=-491 b26=-203 drift=288
+  h=19: b25=-484 b26=-166 drift=318
+  h=20: b25=-554 b26=-148 drift=406
+  h=21: b25=-670 b26=-197 drift=474
+  h=22: b25=-405 b26=-84 drift=321
+  h=23: b25=-393 b26=14 drift=407
+  mean drift = 35
+[baseline - JanFeb drift] VAL MAE=1595.84
+  mo=3: MAE=1612.26 bias=-445
+  mo=4: MAE=1466.98 bias=-340
+  mo=5: MAE=1693.52 bias=137
+  mo=6: MAE=1617.75 bias=-138
+overall Jan-Feb drift = 35 (b25=-651 b26=-615)
+[baseline - overall JanFeb drift] VAL MAE=1573.78
+
+== Ridge with all features ==
+[Ridge a=1.0] VAL MAE=1736.51
+  [ridge+¦Ë0.5*(ens-ridge)] VAL MAE=1606.63
+  [ridge+¦Ë0.7*(ens-ridge)] VAL MAE=1579.62
+[Ridge a=10.0] VAL MAE=1734.88
+  [ridge+¦Ë0.5*(ens-ridge)] VAL MAE=1607.96
+  [ridge+¦Ë0.7*(ens-ridge)] VAL MAE=1581.05
+[Ridge a=100.0] VAL MAE=1733.56
+  [ridge+¦Ë0.5*(ens-ridge)] VAL MAE=1609.57
+  [ridge+¦Ë0.7*(ens-ridge)] VAL MAE=1582.42
+
+== best combo ==
+[baseline - per-hour - JanFeb drift] VAL MAE=1617.66
+[baseline - per-hour - overall drift] VAL MAE=1566.99

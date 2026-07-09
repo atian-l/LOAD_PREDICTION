@@ -1,0 +1,20 @@
+building ...
+training full ensemble ...
+[baseline              ] VAL MAE=1569.48
+computing 3-fold OOF ...
+OOF n=22947 MAE=1566.55
+OOF ÈÕÊý=242  day_resid stats: mean=-121 std=1518
+  corr(day_resid, pl_mean   ) = -0.260
+  corr(day_resid, pl_std    ) = 0.093
+  corr(day_resid, temp_mean ) = 0.095
+  corr(day_resid, hdd_mean  ) = -0.132
+  corr(day_resid, cdd_mean  ) = -0.039
+  corr(day_resid, irrad_mean) = 0.113
+  corr(day_resid, mo        ) = 0.024
+  corr(day_resid, dow       ) = -0.019
+[+ day-ridge a= 1.0    ] VAL MAE=1729.15
+[+ day-ridge a=10.0    ] VAL MAE=1653.77
+[+ day-ridge a=50.0    ] VAL MAE=1615.67
+[+ day-lgb nl= 8        ] VAL MAE=1803.30
+[+ day-lgb nl=16        ] VAL MAE=1783.22
+[+ per-hour only        ] VAL MAE=1563.25

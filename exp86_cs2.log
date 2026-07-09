@@ -1,0 +1,107 @@
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+CS2 峰值收缩缓解跨年稳定性验证  特征数=110  best_it=80
+
+==== Part 0: 诊断前提复核（官方 val 外部预测偏差结构）====
+  高 pred_load(P95+): 外部偏差=+1616.5 MW (n=514)
+  高 actual  (P95+): 外部偏差=-1618.6 MW (n=514)
+  => 方向相反：高 pred_load 过估 vs 高 actual 低估
+  解读：峰值低估（高 actual）点 pred_load 不高（外部漏峰），pred_load 校正无法定位->峰值收缩本质=ext_error
+
+==== Part A: 机制① quantile alpha 上调（原始集成，固定 +0.10 不重搜）====
+baseline alpha=[0.45, 0.5, 0.55]  treat alpha=[0.55, 0.6, 0.65]
+折          n_peak  base_MAE  treat_MAE overallΔ base_peak  treat_peak   peakΔ
+      集成成员数: 40
+      集成成员数: 40
+spring25      442    1731.5     1894.3   +162.9    2336.5      2229.9  -106.6
+      集成成员数: 40
+      集成成员数: 40
+autumn25      437    1606.3     1581.1    -25.2    2826.6      2609.2  -217.4
+      集成成员数: 40
+      集成成员数: 40
+winter26      284    2049.2     1945.5   -103.7    6560.7      5725.9  -834.8
+      集成成员数: 40
+      集成成员数: 40
+official      514    1509.1     1512.4     +3.4    3104.7      2749.6  -355.0
+
+==== Part B: 机制② pred_load≥P95(train) 峰值感知后验校正（全管线）====
+折          n_peak  shift_est  base_MAE  treat_MAE overallΔ base_peak  treat_peak   peakΔ
+  --- fold=spring25 subfolds=2 train_P95(pred_load)=81144
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=17664  hour_bias[96维] 范围=[-1282, 207]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0284)), (12, np.float64(-0.0118)), (13, np.float64(0.0092)), (14, np.float64(-0.0033))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=356 shift=+56.5
+      threshold_corr[precip>0.0, 全天] n=681 shift=-212.9
+      threshold_corr[temp<8.0, 全天] n=2994 shift=-91.3
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=50 shift=-4173.7
+      threshold_corr[pred_load>81143.5435, 全天] n=327 shift=-1596.1
+      集成成员数: 40
+spring25      442    -1596.1    1985.1     1987.4     +2.3    2133.6      2180.5   +46.9
+  --- fold=autumn25 subfolds=3 train_P95(pred_load)=85207
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=26496  hour_bias[96维] 范围=[-1319, 410]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(0.0241)), (12, np.float64(-0.0002)), (13, np.float64(-0.0305)), (14, np.float64(-0.0528))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1083 shift=+1343.8
+      threshold_corr[precip>0.0, 全天] n=8719 shift=-997.1
+      threshold_corr[temp<8.0, 全天] n=4399 shift=-29.5
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=322 shift=-2159.9
+      threshold_corr[pred_load>85206.627, 全天] n=1874 shift=-4259.0
+      集成成员数: 40
+autumn25      437    -4259.0    1797.8     1801.7     +3.9    2362.4      2440.3   +78.0
+  --- fold=winter26 subfolds=3 train_P95(pred_load)=84405
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=26496  hour_bias[96维] 范围=[-1183, 534]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(0.0173)), (12, np.float64(-0.0005)), (13, np.float64(-0.003)), (14, np.float64(-0.0231))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=929 shift=+1412.7
+      threshold_corr[precip>0.0, 全天] n=11071 shift=-852.1
+      threshold_corr[temp<8.0, 全天] n=4257 shift=+67.5
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=552 shift=-1029.4
+      threshold_corr[pred_load>84404.9075, 全天] n=2334 shift=-3821.9
+      集成成员数: 40
+winter26      284    -3821.9    1997.9     2011.3    +13.4    5686.2      4461.5 -1224.7
+  --- fold=official subfolds=3 train_P95(pred_load)=84664
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias[96维] 范围=[-959, 980]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.1025)), (12, np.float64(-0.1118)), (13, np.float64(-0.0894)), (14, np.float64(-0.0806))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1133.4
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-280.4
+      threshold_corr[temp<8.0, 全天] n=6954 shift=-519.6
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=402 shift=-2446.5
+      threshold_corr[pred_load>84663.855, 全天] n=399 shift=-3794.9
+      集成成员数: 40
+official      514    -3794.9    1445.6     1446.5     +0.8    2699.8      2716.7   +16.9
+
+================ CS2 判定 ================
+
+[机制①alpha] peak-Δ(各折)=[-106.6, -217.4, -834.8, -355.0]  overall-Δ(各折)=[162.9, -25.2, -103.7, 3.4]
+  peak-Δ 有益(Δ<0): 4/4 折  内3折 peak-Δ=[-106.6, -217.4, -834.8]
+
+[机制②load校正] peak-Δ(各折)=[46.9, 78.0, -1224.7, 16.9]  overall-Δ(各折)=[2.3, 3.9, 13.4, 0.8]
+  peak-Δ 有益(Δ<0): 1/4 折  内3折 peak-Δ=[46.9, 78.0, -1224.7]
+
+综合结论: VALIDATED 某机制可迁移降低峰值收缩

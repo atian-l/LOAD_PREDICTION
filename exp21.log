@@ -1,0 +1,36 @@
+building ...
+training full ensemble ...
+[baseline ¦Ë0.8] VAL MAE=1569.48
+computing 3-fold OOF ...
+OOF n=22947 ens MAE=1601.14
+
+== OOF per-month ¦Ë* ==
+  mo=1: n=2976 ¦Ë*=0.000  OOF MAE(¦Ë*)=1535.25  OOF MAE(0.8)=1884.02
+  mo=2: n=2593 ¦Ë*=0.802  OOF MAE(¦Ë*)=1497.90  OOF MAE(0.8)=1497.98
+  mo=3: n=2976 ¦Ë*=0.598  OOF MAE(¦Ë*)=1254.14  OOF MAE(0.8)=1271.28
+  mo=4: n=2880 ¦Ë*=0.304  OOF MAE(¦Ë*)=1412.76  OOF MAE(0.8)=1453.48
+  mo=5: n=2881 ¦Ë*=0.500  OOF MAE(¦Ë*)=1516.84  OOF MAE(0.8)=1556.31
+  mo=9: n=2880 ¦Ë*=1.500  OOF MAE(¦Ë*)=1853.81  OOF MAE(0.8)=1831.22
+  mo=10: n=2976 ¦Ë*=0.753  OOF MAE(¦Ë*)=1808.20  OOF MAE(0.8)=1810.67
+  mo=11: n=2785 ¦Ë*=1.048  OOF MAE(¦Ë*)=1192.92  OOF MAE(0.8)=1199.62
+
+[per-month ¦Ë* from OOF] VAL MAE=1588.67
+  mo=3: ¦Ë*=0.598 MAE=1600.54 bias=-338
+  mo=4: ¦Ë*=0.304 MAE=1455.97 bias=-157
+  mo=5: ¦Ë*=0.500 MAE=1636.58 bias=274
+  mo=6: ¦Ë*=0.800 MAE=1730.54 bias=-102
+
+== val oracle per-month ¦Ë (ÉÏ½ç, Ð¹Â©) ==
+  mo=3: oracle ¦Ë=0.443 MAE=1600.73
+  mo=4: oracle ¦Ë=0.815 MAE=1421.15
+  mo=5: oracle ¦Ë=1.479 MAE=1605.68
+  mo=6: oracle ¦Ë=0.569 MAE=1744.50
+[oracle per-month ¦Ë] VAL MAE=1571.97
+
+== OOF per-hour ¦Ë* ==
+[per-hour ¦Ë* from OOF] VAL MAE=1588.22
+
+== OOF per-(month,hour) ¦Ë* ==
+[per-(mo,h) ¦Ë* from OOF] VAL MAE=1622.60
+
+[per-month ¦Ë* + per-hour corr] VAL MAE=1577.38

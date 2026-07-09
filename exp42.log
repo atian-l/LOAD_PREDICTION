@@ -1,0 +1,13 @@
+building ...
+  (mismatch b=8.1854)
+  (b_cs=4.0801)
+  n_feat=132
+=== val 全天方向相关性 ===
+  pl_wr_roll_mean_28d      all-day corr=-0.0215 (n=10272)
+  pl_wr_roll_mean_96       all-day corr=+0.1537 (n=10272)
+  pl_weather_residual      all-day corr=+0.2926 (n=10272)
+
+training final ensemble ...
+  no-bias:   VAL MAE=1538.58
+  +per-hour: VAL MAE=1528.29
+  午间 MAE=3187.35  非午间 MAE=1291.28

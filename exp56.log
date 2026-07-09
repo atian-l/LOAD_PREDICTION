@@ -1,0 +1,14 @@
+features=126 usable=75840
+train_only=67200 holdout=8640 val=10272
+building train/holdout/val sequences ...
+  train seqs=67200 holdout=8640 val=10272
+  ep01 train_loss=1629.3 holdout_MAE=1696.5 best=1696.5 bad=0
+  ep02 train_loss=1607.0 holdout_MAE=1747.0 best=1696.5 bad=1
+  ep03 train_loss=1564.2 holdout_MAE=1970.8 best=1696.5 bad=2
+  ep04 train_loss=1518.4 holdout_MAE=2164.4 best=1696.5 bad=3
+  ep05 train_loss=1494.0 holdout_MAE=2325.0 best=1696.5 bad=4
+  ep06 train_loss=1477.4 holdout_MAE=2481.0 best=1696.5 bad=5
+  early stop
+
+LSTM raw val MAE = 1639.79  (LightGBM raw=1528.74, 生产=1512.63)
+LSTM holdout(raw) MAE = 1696.51

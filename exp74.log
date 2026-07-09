@@ -1,0 +1,93 @@
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+e:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-835, 682]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0869)), (12, np.float64(-0.092)), (13, np.float64(-0.0729)), (14, np.float64(-0.0639))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1089.0
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-266.2
+      threshold_corr[temp<8.0, 全天] n=6954 shift=-527.8
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=402 shift=-2520.9
+基线(v4)=1461.63  特征数=126
+
+=== A 天气导数 ===
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-808, 707]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0866)), (12, np.float64(-0.0909)), (13, np.float64(-0.0718)), (14, np.float64(-0.0635))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1123.1
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-250.8
+      threshold_corr[temp<8.0, 全天] n=6954 shift=-518.2
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=402 shift=-2488.3
+  [A 天气导数] val MAE=1475.06  Δ=+13.43  (新增列 5)
+=== B 历史窗口 ===
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-873, 678]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0872)), (12, np.float64(-0.0915)), (13, np.float64(-0.0719)), (14, np.float64(-0.0633))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1102.7
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-279.2
+      threshold_corr[temp<8.0, 全天] n=6954 shift=-553.0
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=402 shift=-2538.6
+  [B 历史窗口] val MAE=1463.02  Δ=+1.39  (新增列 7)
+=== C 连续编码 ===
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-853, 690]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0888)), (12, np.float64(-0.0929)), (13, np.float64(-0.0738)), (14, np.float64(-0.0633))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1107.3
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-270.1
+      threshold_corr[temp<8.0, 全天] n=6954 shift=-539.1
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=402 shift=-2517.8
+  [C 连续编码] val MAE=1462.79  Δ=+1.16  (新增列 4)
+=== D 细化节假日 ===
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-850, 664]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0879)), (12, np.float64(-0.0908)), (13, np.float64(-0.0722)), (14, np.float64(-0.0634))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1089.2
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-278.2
+      threshold_corr[temp<8.0, 全天] n=6954 shift=-540.5
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=402 shift=-2536.7
+  [D 细化节假日] val MAE=1462.39  Δ=+0.76  (新增列 3)
+
+=== E 组合(全加) ===
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-846, 705]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0879)), (12, np.float64(-0.092)), (13, np.float64(-0.0728)), (14, np.float64(-0.0645))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1117.2
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-290.2
+      threshold_corr[temp<8.0, 全天] n=6954 shift=-543.2
+      threshold_corr[clearnessrange[0.2,0.5), h[11, 12, 13, 14]] n=402 shift=-2508.2
+  [E 全组合] val MAE=1472.47  Δ=+10.84  (新增列 19)

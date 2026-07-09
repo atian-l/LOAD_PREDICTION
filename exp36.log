@@ -1,0 +1,29 @@
+E:\01\python\SdPproject\load_prediction\load_pred\exp36.py:61: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_x_midday"] = ir_clean * X["is_midday"].values
+E:\01\python\SdPproject\load_prediction\load_pred\exp36.py:62: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_x_midday"] = pl * ir_clean * X["is_midday"].values
+E:\01\python\SdPproject\load_prediction\load_pred\exp36.py:63: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * X["is_midday"].values
+building ...
+  n_feat=103
+training final ensemble ...
+  no-bias:   VAL MAE=1551.15
+  +per-hour: VAL MAE=1547.47
+
+=== 场景分解（模型预测，+per-hour）===
+  all                     : n=10272 MAE=1547.5 bias=-169.4
+  午间11-13                 : n= 1284 MAE=3221.1 bias=-121.9
+  非午间                     : n= 8988 MAE=1308.4 bias=-176.2
+  白天8-16                  : n= 3852 MAE=2747.6 bias=-225.6
+  白天多云                    : n=  567 MAE=3608.7 bias=-378.9
+  白天晴                     : n= 3285 MAE=2599.0 bias=-199.1
+  午间&多云                   : n=  191 MAE=4472.2 bias=-615.3
+  --- 按小时 MAE top8 ---
+    h=13 n= 428 MAE=3280.3
+    h=12 n= 428 MAE=3236.5
+    h=11 n= 428 MAE=3146.6
+    h= 9 n= 428 MAE=2960.6
+    h=10 n= 428 MAE=2958.5
+    h=14 n= 428 MAE=2815.0
+    h= 8 n= 428 MAE=2438.7
+    h=15 n= 428 MAE=2249.6

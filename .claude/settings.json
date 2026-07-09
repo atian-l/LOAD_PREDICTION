@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(PYTHONWARNINGS=ignore python -u exp51.py)",
+      "Bash(PYTHONWARNINGS=ignore python -u -c ' *)",
+      "Bash(PYTHONWARNINGS=ignore python -u exp53.py)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(mkdir -p load_pred_v2/load_pred load_pred_v2/data load_pred_v2/models/boosters load_pred_v2/output)",
+      "Bash(cp load_pred/__init__.py load_pred/config.py load_pred/data_loader.py load_pred/features.py load_pred/model.py load_pred/train.py load_pred/predict.py load_pred/README.md load_pred_v2/load_pred/)",
+      "Bash(cp data/direct_load_latest.csv data/shandong_weather_15min.csv load_pred_v2/data/)",
+      "Bash(cp models/model_bundle.pkl load_pred_v2/models/)",
+      "Bash(cp models/boosters/*.txt load_pred_v2/models/boosters/)",
+      "Bash(taskkill //F //IM python.exe)",
+      "Bash(python -m load_pred.predict --run-date 2026-05-18)",
+      "Bash(nohup python -m load_pred.train)",
+      "Bash(echo \"started PID=$!\")",
+      "Bash(tasklist)"
+    ]
+  }
+}

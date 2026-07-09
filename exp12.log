@@ -1,0 +1,40 @@
+building ...
+determining best_it (3-fold) ...
+best_it=252
+trained 40 members
+
+=== aggregation sweep ===
+[mean                  ] VAL MAE=1538.69
+[median                ] VAL MAE=1531.08
+[trim20%_mean          ] VAL MAE=1531.63
+[trim10%_mean          ] VAL MAE=1534.53
+
+=== final shrinkage lambda (mean ens -> pred_load) ===
+[lam=0.5               ] VAL MAE=1547.39
+[lam=0.6               ] VAL MAE=1536.57
+[lam=0.7               ] VAL MAE=1529.89
+[lam=0.8               ] VAL MAE=1527.93
+[lam=0.9               ] VAL MAE=1531.30
+[lam=1.0               ] VAL MAE=1538.69
+
+=== final shrinkage lambda (median ens -> pred_load) ===
+[med_lam=0.5           ] VAL MAE=1547.49
+[med_lam=0.6           ] VAL MAE=1535.80
+[med_lam=0.7           ] VAL MAE=1527.77
+[med_lam=0.8           ] VAL MAE=1524.11
+[med_lam=0.9           ] VAL MAE=1525.61
+[med_lam=1.0           ] VAL MAE=1531.08
+
+=== pred_load mean-regression on ensemble ===
+[regress_k=0.05        ] VAL MAE=1594.64
+[regress_k=0.1         ] VAL MAE=1741.01
+[regress_k=0.15        ] VAL MAE=1942.83
+[regress_k=0.2         ] VAL MAE=2185.17
+[regress_k=0.25        ] VAL MAE=2456.62
+[regress_k=0.3         ] VAL MAE=2752.93
+
+=== median + pred_load mean-regression ===
+[med_regress_k=0.1     ] VAL MAE=1723.24
+[med_regress_k=0.15    ] VAL MAE=1922.78
+[med_regress_k=0.2     ] VAL MAE=2164.18
+[med_regress_k=0.25    ] VAL MAE=2435.62

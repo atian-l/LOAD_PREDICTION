@@ -1,0 +1,9 @@
+building ...
+  n_feat=126  usable=75840
+training global ensemble + OOF ...
+  全局+per-hour+drift: 全体=1513.80  午间(11-14)=2998
+training midday-only ensemble (高 BI) ...
+  午间专用 BI=150: 午间MAE=3200  混合全体MAE=1547.61 (vs 全局 1513.80, delta=+33.81)
+  午间专用 BI=300: 午间MAE=3178  混合全体MAE=1543.95 (vs 全局 1513.80, delta=+30.15)
+  午间专用 BI=600: 午间MAE=3163  混合全体MAE=1541.37 (vs 全局 1513.80, delta=+27.57)
+done.

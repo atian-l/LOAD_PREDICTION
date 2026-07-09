@@ -1,0 +1,6 @@
+# 山东省全省日前(D+1)负荷预测系统 v7 - Python 依赖
+# 测试环境：Python 3.14
+lightgbm==4.6
+pandas==3.0
+numpy==2.4
+scikit-learn==1.9

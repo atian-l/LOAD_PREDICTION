@@ -1,0 +1,14 @@
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+training full ensemble ...
+      集成成员数: 40
+raw val MAE = 1528.74
+
+OOF hour_bias[mean      ] + drift  val MAE = 1512.63  (Δraw -16.12)
+OOF hour_bias[median    ] + drift  val MAE = 1523.19  (Δraw -5.55)
+OOF hour_bias[trimmed10 ] + drift  val MAE = 1514.39  (Δraw -14.35)
+
+ORACLE hour_bias[mean      ] + drift  val MAE = 1532.34  (Δraw +3.60)
+ORACLE hour_bias[median    ] + drift  val MAE = 1530.34  (Δraw +1.60)
+ORACLE hour_bias[trimmed10 ] + drift  val MAE = 1530.99  (Δraw +2.25)

@@ -1,0 +1,15 @@
+full ensemble ...
+      集成成员数: 40
+  raw val MAE = 1528.74
+3-fold OOF ...
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+  OOF clearness β(11-14) = [np.float64(514.4), np.float64(918.8), np.float64(-54.6), np.float64(-715.5)]
+  ORACLE clearness β(11-14) = [np.float64(452.8), np.float64(1313.4), np.float64(607.1), np.float64(501.5)]  (迁移性参考)
+
+A  per-hour + pl_wr drift        = 1512.63  (生产=1512.63)
+B  + clearness drift             = nan  (ΔA +nan)
+C  per-hour + clearness drift    = nan  (替换pl_wr)
+D  + 午间clear>0.7 减 +1407     = 1507.53  (ΔA -5.09, n=1237)
+E  oracle 午间clear>0.7 减 +792  = 1502.03  (天花板, ΔA -10.59)

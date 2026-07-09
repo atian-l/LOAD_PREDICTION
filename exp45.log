@@ -1,0 +1,4 @@
+building ...
+  n_feat=126  usable=75840
+  hyperparams: nl=255 mdl=200 l2=4.0 lam=1.0  seeds=3
+  BI=  80: no-bias=1530.82  +per-hour=1526.86  (bias delta=-3.95, hb_range=[-841,686])

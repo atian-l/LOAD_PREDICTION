@@ -1,0 +1,7 @@
+CatBoost 3-fold OOF ...
+  fold 2025-02-28 done
+  fold 2025-08-31 done
+  fold 2025-12-31 done
+CatBoost full ensemble ...
+CatBoost raw val MAE = 1550.71  (LightGBM raw=1528.74)
+CatBoost + OOF per-hour + drift val MAE = 1561.33  (LightGBM prod=1512.63)

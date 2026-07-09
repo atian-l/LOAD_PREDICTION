@@ -1,0 +1,14 @@
+building ...
+  n_feat=126  usable=75840
+training full ensemble (BI=80) + 3-fold OOF ...
+  no-bias VAL MAE=1530.82
+== (A) per-hour 加权变体 ==
+  3-fold 均值    : +per-hour=1526.86  (delta=-3.95)
+  仅冬折(最近)   : +per-hour=1621.32  (delta=+90.51)
+  仅春折(季节)   : +per-hour=1702.06  (delta=+171.24)
+  近邻时间加权   : +per-hour=1547.66  (delta=+16.84)
+  -> 最佳 per-hour: mean (1526.86)
+== (B) β×pl_wr 方向校正 (叠加最佳 per-hour) ==
+  β=-0.0567  +per-hour+β·pl_wr=1598.35  (vs +per-hour 1526.86, delta=+71.48)
+  +per-hour+β_midday·pl_wr=1516.16  (delta=-10.70)
+done.

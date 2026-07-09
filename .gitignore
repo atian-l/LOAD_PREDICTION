@@ -1,0 +1,10 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# CatBoost training scratch
+catboost_info/
+
+# NOTE: load_pred_v2~v7 archives and model artifacts (*.txt / *.pkl)
+# are intentionally kept in the repo per project decision.

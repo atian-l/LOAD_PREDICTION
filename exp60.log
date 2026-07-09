@@ -1,0 +1,39 @@
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+A  生产 = 1512.63
+
+=== 阈值 mean/median/shrink @11-14 ===
+  thr>0.6 mean ×1.0                          shift=  +1051 n=1354  MAE=1503.82  (ΔA -8.81)
+  thr>0.6 mean ×0.7                          shift=   +735 n=1354  MAE=1502.51  (ΔA -10.11)
+  thr>0.6 mean ×0.5                          shift=   +525 n=1354  MAE=1503.41  (ΔA -9.21)
+  thr>0.6 median ×1.0                        shift=  +1636 n=1354  MAE=1516.57  (ΔA +3.95)
+  thr>0.6 median ×0.7                        shift=  +1146 n=1354  MAE=1504.97  (ΔA -7.66)
+  thr>0.6 median ×0.5                        shift=   +818 n=1354  MAE=1502.54  (ΔA -10.08)
+  thr>0.7 mean ×1.0                          shift=  +1407 n=1237  MAE=1507.53  (ΔA -5.09)
+  thr>0.7 mean ×0.7                          shift=   +985 n=1237  MAE=1502.29  (ΔA -10.33)
+  thr>0.7 mean ×0.5                          shift=   +704 n=1237  MAE=1502.29  (ΔA -10.34)
+  thr>0.7 median ×1.0                        shift=  +2026 n=1237  MAE=1527.05  (ΔA +14.42)
+  thr>0.7 median ×0.7                        shift=  +1418 n=1237  MAE=1507.78  (ΔA -4.85)
+  thr>0.7 median ×0.5                        shift=  +1013 n=1237  MAE=1502.42  (ΔA -10.21)
+  thr>0.8 mean ×1.0                          shift=  +1556 n= 766  MAE=1503.91  (ΔA -8.72)
+  thr>0.8 mean ×0.7                          shift=  +1089 n= 766  MAE=1500.68  (ΔA -11.95)
+  thr>0.8 mean ×0.5                          shift=   +778 n= 766  MAE=1501.78  (ΔA -10.84)
+  thr>0.8 median ×1.0                        shift=  +2459 n= 766  MAE=1523.54  (ΔA +10.92)
+  thr>0.8 median ×0.7                        shift=  +1721 n= 766  MAE=1506.41  (ΔA -6.22)
+  thr>0.8 median ×0.5                        shift=  +1229 n= 766  MAE=1500.98  (ΔA -11.65)
+
+=== 小时窗 12-13 / 11-13 ===
+  12-13 thr>0.7 mean ×1.0                    shift=  +1498 n= 660  MAE=1506.55  (ΔA -6.07)
+  12-13 thr>0.7 mean ×0.7                    shift=  +1049 n= 660  MAE=1504.28  (ΔA -8.34)
+  12-13 thr>0.7 median ×1.0                  shift=  +2062 n= 660  MAE=1514.88  (ΔA +2.26)
+  12-13 thr>0.7 median ×0.7                  shift=  +1444 n= 660  MAE=1505.99  (ΔA -6.64)
+  11-13 thr>0.7 mean ×1.0                    shift=  +1471 n= 992  MAE=1515.45  (ΔA +2.82)
+  11-13 thr>0.7 mean ×0.7                    shift=  +1030 n= 992  MAE=1508.42  (ΔA -4.20)
+  11-13 thr>0.7 median ×1.0                  shift=  +2067 n= 992  MAE=1533.32  (ΔA +20.69)
+  11-13 thr>0.7 median ×0.7                  shift=  +1447 n= 992  MAE=1514.88  (ΔA +2.26)
+
+=== 线性 β×clearness @午间 ===
+  线性 β×clearness @ [11, 12, 13, 14]  MAE=1516.17  (ΔA +3.55)
+  线性 β×clearness @ [12, 13]  MAE=1519.44  (ΔA +6.82)

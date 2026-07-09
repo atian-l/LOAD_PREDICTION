@@ -1,0 +1,37 @@
+building ...
+training full ensemble ...
+[baseline] VAL MAE=1569.48
+  spread stats: mean=376 std=348
+  corr(spread, |err|) val = 0.425
+  corr(spread, err) val = -0.010
+  mo=3: spread_mean=308 |err|_mean=1607
+  mo=4: spread_mean=318 |err|_mean=1421
+  mo=5: spread_mean=394 |err|_mean=1598
+  mo=6: spread_mean=353 |err|_mean=1731
+
+computing 3-fold OOF ...
+  OOF corr(spread, |err|) = 0.264
+
+== per-spread-bin ¦Ë (OOF) ==
+  spread[59,170): n=4590 ¦Ë*=0.5 |err|=600
+  spread[170,252): n=4589 ¦Ë*=0.6 |err|=829
+  spread[252,387): n=4589 ¦Ë*=0.5 |err|=1412
+  spread[387,607): n=4589 ¦Ë*=0.5 |err|=2176
+  spread[607,7323): n=4589 ¦Ë*=0.4 |err|=2816
+[per-spread-bin ¦Ë] VAL MAE=1587.84
+
+== continuous ¦Ë(spread) ==
+[¦Ë=0.9-0.1*spread_norm] VAL MAE=1575.04
+[¦Ë=0.9-0.2*spread_norm] VAL MAE=1581.74
+[¦Ë=0.9-0.3*spread_norm] VAL MAE=1589.42
+[¦Ë=0.9-0.5*spread_norm] VAL MAE=1603.95
+
+== ¦Ë based on |ens-pl| (correction magnitude) ==
+  |ens-pl|[0,149): n=4590 ¦Ë*=0.7
+  |ens-pl|[149,329): n=4589 ¦Ë*=0.7
+  |ens-pl|[329,584): n=4589 ¦Ë*=0.7
+  |ens-pl|[584,1113): n=4589 ¦Ë*=0.5
+  |ens-pl|[1113,9083): n=4589 ¦Ë*=0.4
+[per-|ens-pl|-bin ¦Ë] VAL MAE=1592.26
+
+[per-spread ¦Ë + per-hour corr] VAL MAE=1577.96

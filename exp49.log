@@ -1,0 +1,13 @@
+building ...
+  n_feat=126  usable=75840
+training full ensemble (BI=80) + 3-fold OOF ...
+  no-bias=1530.82  +per-hour=1526.86
+== 午间窗口/特征精调 ==
+  pl_wr 10-13: MAE=1517.30  (delta=-9.56)
+  pl_wr 11-14: MAE=1513.80  (delta=-13.06)
+  pl_wr 11-13: MAE=1516.16  (delta=-10.70)
+  pl_wr 10-14: MAE=1514.94  (delta=-11.93)
+  pl_wr 09-15: MAE=1514.36  (delta=-12.50)
+  11-13 多元(pl_wr+rm96+d672): MAE=1519.54  (delta=-7.33)
+  11-13 pl_wr+solar_mismatch: MAE=1544.44  (delta=+17.58)
+done.

@@ -1,0 +1,20 @@
+training full ensemble ...
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-835, 682]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0869)), (12, np.float64(-0.092)), (13, np.float64(-0.0729)), (14, np.float64(-0.0639))]
+external pred_load val MAE = 1660.43
+production model val MAE = 1512.63  (基准)
+
+prod + past-actuals MOS(K= 3d, per-hour) val MAE = 1602.92  (Δprod +90.30)
+prod + past-actuals MOS(K= 7d, per-hour) val MAE = 1535.54  (Δprod +22.92)
+prod + past-actuals MOS(K=14d, per-hour) val MAE = 1557.03  (Δprod +44.40)
+
+external + past-actuals MOS(K=7d) val MAE = 1656.56  (Δext -3.87)
+
+prod + DAY-level MOS(K= 3d) val MAE = 1664.53  (Δprod +151.91)
+prod + DAY-level MOS(K= 7d) val MAE = 1613.89  (Δprod +101.26)
+prod + DAY-level MOS(K=14d) val MAE = 1583.49  (Δprod +70.86)
+prod + DAY-level MOS(K=30d) val MAE = 1519.01  (Δprod +6.38)

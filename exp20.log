@@ -1,0 +1,31 @@
+building ...
+== pred_load vs model bias by month (val) ==
+  pred_load VAL MAE (纯外部预测) = 1660.43
+  mo=3: pred_load_bias=-126  pred_load_MAE=1621.43
+  mo=4: pred_load_bias=-67  pred_load_MAE=1514.64
+  mo=5: pred_load_bias=443  pred_load_MAE=1754.55
+  mo=6: pred_load_bias=157  pred_load_MAE=1838.08
+
+training baseline (3 seeds, aw5.0) ...
+[baseline] VAL MAE=1569.48  ens MAE=1572.34
+  mo=3: ens_bias=-481 model_bias=-410
+  mo=4: ens_bias=-365 model_bias=-305
+  mo=5: ens_bias=105 model_bias=172
+  mo=6: ens_bias=-167 model_bias=-102
+
+training 5 seeds (40 成员) ...
+[5 seeds λ0.8] VAL MAE=1569.76
+[5 seeds λ0.85] VAL MAE=1569.43
+[5 seeds λ0.9] VAL MAE=1569.78
+[5 seeds λ0.95] VAL MAE=1570.84
+
+== month-feature ablation ==
+  dropping: ['month']
+[no-month λ0.8] VAL MAE=1569.80
+  mo=3: MAE=1603.84 bias=-408
+  mo=4: MAE=1423.16 bias=-308
+  mo=5: MAE=1598.35 bias=178
+  mo=6: MAE=1733.71 bias=-102
+
+== train_start=2023-02-01 ==
+[ts2023 λ0.8] VAL MAE=1570.65

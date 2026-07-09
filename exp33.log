@@ -1,0 +1,10 @@
+building ...
+training final ensemble ...
+  no-bias:        VAL MAE=1554.46
+computing OOF ...
+  +per-hour(all): VAL MAE=1549.47
+  +per-hour(win=30d): VAL MAE=1613.44
+  +per-hour(win=60d): VAL MAE=1592.65
+  +per-hour(win=90d): VAL MAE=1592.64
+  +per-hour(win=120d): VAL MAE=1562.46
+  +per-hour(win=180d): VAL MAE=1547.59

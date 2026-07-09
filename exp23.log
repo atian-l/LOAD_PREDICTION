@@ -1,0 +1,38 @@
+building ...
+training ensemble ...
+[ensemble ¦Ë0.8] VAL MAE=1569.48
+[pred_load only ] VAL MAE=1660.43
+[ens only       ] VAL MAE=1572.34
+
+== per-hour linear actual~pred_load ==
+[per-hour linear] VAL MAE=1617.88
+  mo=3: lin MAE=1691.30 bias=-175  ens MAE=1606.76
+  mo=4: lin MAE=1452.42 bias=70  ens MAE=1420.95
+  mo=5: lin MAE=1644.27 bias=523  ens MAE=1598.02
+  mo=6: lin MAE=1742.56 bias=209  ens MAE=1730.54
+
+== blend linear & ensemble ==
+[blend lin0.3+ens0.7] VAL MAE=1567.47
+[blend lin0.5+ens0.5] VAL MAE=1574.39
+[blend lin0.7+ens0.3] VAL MAE=1587.73
+[lin+¦Ë0.3*(ens-lin)] VAL MAE=1582.12
+[lin+¦Ë0.5*(ens-lin)] VAL MAE=1568.02
+[lin+¦Ë0.7*(ens-lin)] VAL MAE=1562.73
+[lin+¦Ë0.8*(ens-lin)] VAL MAE=1563.66
+
+== per-(hour,month) linear actual~pred_load ==
+[per-(h,mo) linear] VAL MAE=1750.12
+[lin_hm+¦Ë0.5*(ens-lin_hm)] VAL MAE=1626.27
+[lin_hm+¦Ë0.7*(ens-lin_hm)] VAL MAE=1596.07
+[lin_hm+¦Ë0.8*(ens-lin_hm)] VAL MAE=1585.15
+
+== tree-on-residual-from-linear (extrapolation fix) ==
+[lin-base + tree-resid ¦Ë0.5] VAL MAE=1569.69
+[lin-base + tree-resid ¦Ë0.7] VAL MAE=1564.40
+[lin-base + tree-resid ¦Ë0.8] VAL MAE=1564.84
+[lin-base + tree-resid ¦Ë0.9] VAL MAE=1567.57
+[lin-base + tree-resid ¦Ë1.0] VAL MAE=1572.33
+  mo=3: MAE=1631.91 bias=-410
+  mo=4: MAE=1417.15 bias=-271
+  mo=5: MAE=1580.65 bias=193
+  mo=6: MAE=1688.95 bias=-75

@@ -1,0 +1,92 @@
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-835, 682]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0869)), (12, np.float64(-0.092)), (13, np.float64(-0.0729)), (14, np.float64(-0.0639))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1089.0
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-266.2
+基线 MAE=1493.66
+
+=== 按 temp 分桶 ===
+   -99~   0C  n=   54  bias=  -483.9  MAE=753.6
+     0~   5C  n=  898  bias= -1164.0  MAE=1641.2
+     5~  10C  n= 1129  bias=  -564.8  MAE=1551.0
+    10~  15C  n= 1959  bias=    49.1  MAE=956.3
+    15~  20C  n= 2691  bias=    43.4  MAE=1372.7
+    20~  25C  n= 2201  bias=   178.5  MAE=1862.1
+    25~  30C  n=  941  bias=   -73.9  MAE=1952.5
+    30~  99C  n=  207  bias=  1200.0  MAE=1782.5
+
+=== 日级残差 vs 日级天气 相关 ===
+  corr(day_bias, temp     ) = +0.214
+  corr(day_bias, temp_min ) = +0.233
+  corr(day_bias, irrad    ) = +0.149
+  corr(day_bias, clear    ) = +0.087
+  corr(day_bias, precip   ) = +0.041
+  corr(day_bias, pl       ) = +0.145
+
+=== 顶偏置日（|day_r| 最大 15）===
+             day_r  temp  temp_min  irrad  clear  precip       pl
+d                                                                
+2026-05-20  5524.4  18.2      15.7  118.3    0.2     0.0  74350.3
+2026-03-03 -4181.5   3.4       0.8  125.1    0.2     0.0  65410.6
+2026-05-17  3715.8  22.9      18.3  242.9    0.7     0.0  64765.7
+2026-03-04 -3590.7   4.6       1.5   98.5    0.2     0.0  69457.7
+2026-03-01 -3444.0   4.0       3.4    0.0    0.0     0.0  67239.5
+2026-04-13  3392.1  15.8      11.2  223.3    0.3     0.0  64211.2
+2026-03-02 -2857.7   2.4       1.2   97.1    0.2     0.0  71051.9
+2026-06-07  2693.8  19.2      14.9  307.3    0.4     0.0  60126.5
+2026-05-19  2422.6  19.6      18.1  121.7    0.3     0.0  70003.2
+2026-04-12  2362.8  17.0      11.8  243.3    0.4     0.0  60175.9
+2026-06-09 -2161.0  23.1      17.7  310.6    0.4     0.0  59025.5
+2026-03-05 -2156.5   5.2       2.0   81.4    0.1     0.0  73300.7
+2026-04-09 -1972.0  13.3      10.4  131.5    0.2     0.0  68232.8
+2026-05-15 -1951.1  21.4      16.5  287.3    0.7     0.0  60898.3
+2026-03-09  1946.3   5.1       1.3  207.7    0.4     0.0  66186.0
+
+=== 日级 temp 分桶 ===
+  daytemp -99~  5C  n_days=  6  day_bias= -2180.6  day_MAE=2900.1
+  daytemp   5~ 10C  n_days= 14  day_bias=    30.5  day_MAE=1429.6
+  daytemp  10~ 15C  n_days= 17  day_bias=  -123.0  day_MAE=1067.8
+  daytemp  15~ 20C  n_days= 33  day_bias=   119.0  day_MAE=1499.9
+  daytemp  20~ 25C  n_days= 28  day_bias=   -91.3  day_MAE=1539.2
+  daytemp  25~ 99C  n_days=  7  day_bias=   535.8  day_MAE=1360.3
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+Traceback (most recent call last):
+  File "E:\01\python\SdPproject\load_prediction\exp66.py", line 120, in <module>
+    main()
+    ~~~~^^
+  File "E:\01\python\SdPproject\load_prediction\exp66.py", line 102, in main
+    coef, *_ = np.linalg.lstsq(A, y, rcond=None)
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\atian\AppData\Roaming\Python\Python314\site-packages\numpy\linalg\_linalg.py", line 2540, in lstsq
+    x, resids, rank, s = _umath_linalg.lstsq(a, b, rcond,
+                         ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+                                             signature=signature)
+                                             ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\atian\AppData\Roaming\Python\Python314\site-packages\numpy\linalg\_linalg.py", line 156, in _raise_linalgerror_lstsq
+    raise LinAlgError("SVD did not converge in Linear Least Squares")
+numpy.linalg.LinAlgError: SVD did not converge in Linear Least Squares

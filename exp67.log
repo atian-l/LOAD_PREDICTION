@@ -1,0 +1,79 @@
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-835, 682]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0869)), (12, np.float64(-0.092)), (13, np.float64(-0.0729)), (14, np.float64(-0.0639))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1089.0
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-266.2
+基线 = 1493.66
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+  temp 范围: OOF[-9.8, 34.8]  val[nan, nan]
+
+=== temp 阈值校正（全天 / 仅白天 8-20）===
+            cond    hrs   shk   oof_sh   n_v       MAE        Δ
+          temp<0     全天   1.0  -1393.5    54   1495.42    +1.77
+          temp<0     全天   0.7   -975.5    54   1493.85    +0.19
+          temp<0   8-20   1.0  -3092.4     3   1493.96    +0.30
+          temp<0   8-20   0.7  -2164.7     3   1493.87    +0.21
+          temp<5     全天   1.0   -821.2   952   1484.37    -9.28
+          temp<5     全天   0.7   -574.9   952   1481.49   -12.17
+          temp<5   8-20   1.0  -1767.0   261   1482.32   -11.33
+          temp<5   8-20   0.7  -1236.9   261   1484.39    -9.27
+          temp<8     全天   1.0   -570.0  1500   1478.25   -15.41
+          temp<8     全天   0.7   -399.0  1500   1478.80   -14.86
+          temp<8   8-20   1.0  -1175.8   553   1482.54   -11.12
+          temp<8   8-20   0.7   -823.0   553   1484.13    -9.53
+         temp>28     全天   1.0   -256.5   478   1496.05    +2.39
+         temp>28     全天   0.7   -179.5   478   1495.24    +1.58
+         temp>28   8-20   1.0   -247.3   478   1495.95    +2.29
+         temp>28   8-20   0.7   -173.1   478   1495.18    +1.52
+         temp>30     全天   1.0    231.3   207   1491.96    -1.70
+         temp>30     全天   0.7    161.9   207   1492.43    -1.22
+         temp>30   8-20   1.0    231.3   207   1491.96    -1.70
+         temp>30   8-20   0.7    161.9   207   1492.43    -1.22
+         temp>32     全天   1.0    393.7    69   1492.26    -1.40
+         temp>32     全天   0.7    275.6    69   1492.65    -1.01
+         temp>32   8-20   1.0    393.7    69   1492.26    -1.40
+         temp>32   8-20   0.7    275.6    69   1492.65    -1.01
+
+=== 二次 temp 回归校正（OOF 拟合，val 应用）===
+  deg=1 coef=[  48.904 -495.079]  MAE(去均值)=1478.42  Δ=-15.24
+         MAE(不去均值)=1527.04  Δ=+33.39
+  deg=2 coef=[  -5.258  170.638 -793.242]  MAE(去均值)=1522.21  Δ=+28.56
+         MAE(不去均值)=1586.92  Δ=+93.26
+  deg=3 coef=[ 2.20000e-02 -6.03700e+00  1.76019e+02 -7.83280e+02]  MAE(去均值)=1519.11  Δ=+25.45
+         MAE(不去均值)=1584.16  Δ=+90.50
+
+=== 分时段二次 temp（白天8-20 / 夜间）===
+  白天: coef=[   -9.133   312.913 -1809.703]  MAE=1518.54  Δ=+24.88  (n_v=5564)
+  夜间: coef=[  -4.059   98.922 -210.109]  MAE=1505.91  Δ=+12.26  (n_v=4708)
+
+=== 组合 ===
+  shifts: cold(<5)=-821.2 hot(>30)=231.3 clr0.2-0.5@11-14=-2536.3
+  cold+hot                   MAE=1482.67  Δ=-10.99
+  cold+hot+clr0.2-0.5@11-14  MAE=1466.25  Δ=-27.41
+  cold+hot+clr ×0.7            MAE=1466.40  Δ=-27.26
+  cold+hot+clr ×1.0            MAE=1466.25  Δ=-27.41

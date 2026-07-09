@@ -1,0 +1,36 @@
+building ...
+
+[cur+med] best_it=261 n_members=20
+  mean  ¦Ë=1.0 : 1531.12
+  median ¦Ë=1.0 : 1536.35
+  median ¦Ë=0.7: 1534.84
+  median ¦Ë=0.75: 1532.48
+  median ¦Ë=0.8: 1531.16
+  median ¦Ë=0.85: 1530.77
+  median ¦Ë=0.9: 1531.46
+  >> BEST median ¦Ë=0.85 MAE=1530.77
+
+[cur_q3_aw25] best_it=251 n_members=40
+  mean  ¦Ë=1.0 : 1526.11
+  median ¦Ë=1.0 : 1528.25
+  median ¦Ë=0.7: 1529.78
+  median ¦Ë=0.75: 1526.94
+  median ¦Ë=0.8: 1525.12
+  median ¦Ë=0.85: 1524.32
+  median ¦Ë=0.9: 1524.55
+  >> BEST median ¦Ë=0.85 MAE=1524.32
+
+[ts2024_q3_aw25] best_it=252 n_members=40
+  mean  ¦Ë=1.0 : 1538.69
+  median ¦Ë=1.0 : 1531.08
+  median ¦Ë=0.7: 1527.77
+  median ¦Ë=0.75: 1525.36
+  median ¦Ë=0.8: 1524.11
+  median ¦Ë=0.85: 1524.27
+  median ¦Ë=0.9: 1525.61
+  >> BEST median ¦Ë=0.8 MAE=1524.11
+
+=== SUMMARY ===
+  cur+med         : 1530.77  FAIL
+  cur_q3_aw25     : 1524.32  FAIL
+  ts2024_q3_aw25  : 1524.11  FAIL

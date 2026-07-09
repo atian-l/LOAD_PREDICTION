@@ -1,0 +1,4 @@
+building ...
+[mid1.0_base     ] best_it=283 n=40  VAL MAE=1531.46  mid=3038 off=1030  Bias=-206
+[mid1.5          ] best_it=294 n=40  VAL MAE=1531.30  mid=3036 off=1031  Bias=-209
+[mid2.0          ] best_it=297 n=40  VAL MAE=1531.03  mid=3037 off=1030  Bias=-210

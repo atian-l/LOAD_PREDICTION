@@ -1,0 +1,24 @@
+E:\01\python\SdPproject\load_prediction\load_pred\exp30.py:80: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_temp_x_irrad"] = pl * X["temp"] * X["irrad"]
+E:\01\python\SdPproject\load_prediction\load_pred\exp30.py:83: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X[f"pl_ratio_{lag}"] = pl / (X[f"pred_load_lag_{lag}"] + 1e-6)
+E:\01\python\SdPproject\load_prediction\load_pred\exp30.py:85: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_over_roll96"] = pl / (X["pred_load_roll_mean_96"] + 1e-6)
+E:\01\python\SdPproject\load_prediction\load_pred\exp30.py:80: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_temp_x_irrad"] = pl * X["temp"] * X["irrad"]
+E:\01\python\SdPproject\load_prediction\load_pred\exp30.py:83: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X[f"pl_ratio_{lag}"] = pl / (X[f"pred_load_lag_{lag}"] + 1e-6)
+E:\01\python\SdPproject\load_prediction\load_pred\exp30.py:85: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_over_roll96"] = pl / (X["pred_load_roll_mean_96"] + 1e-6)
+[all     ] VAL MAE=1554.40  n_feat=91
+[cyclic  ] VAL MAE=1556.53  n_feat=99
+[triple  ] VAL MAE=1554.33  n_feat=96
+[ratios  ] VAL MAE=1556.35  n_feat=99
+[rich    ] VAL MAE=1559.26  n_feat=105
+
+== rich + per-hour ==
+[rich + per-hour] VAL MAE=1555.02
+  mo=3: MAE=1606.98 bias=-381
+  mo=4: MAE=1390.70 bias=-259
+  mo=5: MAE=1568.87 bias=224
+  mo=6: MAE=1747.61 bias=-68

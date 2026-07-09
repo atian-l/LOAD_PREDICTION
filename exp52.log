@@ -1,0 +1,16 @@
+features=126 usable=75840
+val=10272
+      (使用固定 best_it_fixed=80；walk-forward 已禁用)
+training full ensemble ...
+      集成成员数: 40
+(1) raw ensemble val MAE = 1528.74
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-835, 682]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0869)), (12, np.float64(-0.092)), (13, np.float64(-0.0729)), (14, np.float64(-0.0639))]
+(2) OOF per-hour + OOF drift_corr val MAE = 1512.63  (应≈生产)
+(3) ORACLE per-hour + ORACLE drift_corr val MAE = 1532.34  <- 天花板
+
+headroom (raw->oracle): -3.60 MW
+gap to 1500 (oracle): 32.34 MW

@@ -1,0 +1,9 @@
+运行日期 D   : 2026/05/18
+运行时刻     : 2026/05/18 21:00
+预测目标 D+1 : 2026/05/19  (96 点)
+已加载模型   : E:\01\python\SdPproject\load_prediction\models\model_bundle.pkl  (members=40, shrinkage=1.0)
+
+已输出 D+1 预测:
+  E:\01\python\SdPproject\load_prediction\output\prediction_20260518.csv
+  E:\01\python\SdPproject\load_prediction\output\latest_prediction.csv
+  预测均值=68981.02  最小=57283.24  最大=80189.29

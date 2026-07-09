@@ -1,0 +1,32 @@
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+[1/6] 读取数据并构造特征 ...
+      特征数: 101  可训练点: 75840  [2023/02/01 00:00:00 ~ 2026/06/15 23:45:00]
+[2/6] walk-forward 3 折确定 best_iter ...
+      各折 best_iter=[164, 146, 122]  -> 平均 144
+[3/6] 训练 LightGBM 集成 ...
+      集成成员数: 40
+[3.5/6] 计算 OOF 每小时偏置校正 ...
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-649, 252]
+[4/6] 全量推理 ...
+[5/6] 写出 full_predictions.csv / full_mae.csv ...
+[6/6] 计算官方验证集指标并保存模型 ...
+
+================ 验证集评估 ================
+  MAE: 1548.8359287383178
+  RMSE: 2447.2809388896344
+  R2: 0.918068683447462
+  MAPE(%): 2.608257031440357
+  Bias: -155.48781931464174
+  MAE_q50: 853.505000000001
+  MAE_q90: 3935.3149999999996
+  MAE_q95: 5745.707999999997
+  MAE_q99: 8797.322599999992
+  N_points: 10272
+  val_start: 2026/03/01 00:00:00
+  val_end: 2026/06/15 23:45:00
+==========================================
+模型已保存: E:\01\python\SdPproject\load_prediction\models\model_bundle.pkl

@@ -1,0 +1,13 @@
+== baseline (no interactions) ==
+[baseline] VAL MAE=1569.48  n_feat=77
+
+== + pred_load¡Áweather interactions ==
+[+ interactions] VAL MAE=1564.53  n_feat=85
+  mo=3: base=1606.76 +int=1600.06
+  mo=4: base=1420.95 +int=1416.03
+  mo=5: base=1598.02 +int=1588.43
+  mo=6: base=1730.54 +int=1738.68
+
+== + per-hour on each ==
+[baseline + per-hour] VAL MAE=1563.25
+[+interact + per-hour] VAL MAE=1561.79

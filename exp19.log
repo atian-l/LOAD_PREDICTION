@@ -1,0 +1,39 @@
+building ...
+training full ensemble ...
+== ¦Ë sweep ==
+[¦Ë=0.7] VAL MAE=1572.32
+[¦Ë=0.8] VAL MAE=1569.48
+[¦Ë=0.9] VAL MAE=1569.48
+[¦Ë=1.0] VAL MAE=1572.34
+[¦Ë=1.1] VAL MAE=1577.50
+
+[baseline ¦Ë=0.8] VAL MAE=1569.48
+== per-month breakdown ==
+  mo=3: n=2976 MAE=1606.76 bias=-410 std=2496
+  mo=4: n=2880 MAE=1420.95 bias=-305 std=2334
+  mo=5: n=2976 MAE=1598.02 bias=172 std=2551
+  mo=6: n=1440 MAE=1730.54 bias=-102 std=2398
+
+computing 3-fold OOF ...
+OOF n=22947 MAE=1566.55
+== OOF per-month bias ==
+  mo=1: n=2976 bias=-1402
+  mo=2: n=2593 bias=288
+  mo=3: n=2976 bias=168
+  mo=4: n=2880 bias=501
+  mo=5: n=2881 bias=333
+  mo=9: n=2880 bias=-409
+  mo=10: n=2976 bias=-295
+  mo=11: n=2785 bias=-75
+
+[+ per-hour static     ] VAL MAE=1563.25
+[+ per-hour ¡Á1.3      ] VAL MAE=1568.55
+[+ per-hour ¡Á1.5      ] VAL MAE=1573.42
+[+ per-hour ¡Á2.0      ] VAL MAE=1591.25
+[+ per-hour winter-fold] VAL MAE=1614.34
+[+ per-hour trend      ] VAL MAE=1660.35
+[+ global trend + per-hr] VAL MAE=1715.78
+[+ global trend only   ] VAL MAE=1707.36
+== per-(hour,month) centered (shape only) ==
+[+ (h,mo) shape + per-hr] VAL MAE=1577.92
+[+ (h,mo) shape + gtrend] VAL MAE=1756.19

@@ -1,0 +1,32 @@
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+A 生产 = 1512.63
+
+=== clearness thr>0.8 @11-14, 精调 shrink ===
+  ×0.60 shift=+933 n=766 MAE=1500.97
+  ×0.65 shift=+1011 n=766 MAE=1500.71
+  ×0.70 shift=+1089 n=766 MAE=1500.68
+  ×0.75 shift=+1167 n=766 MAE=1500.81
+  ×0.80 shift=+1245 n=766 MAE=1501.04
+
+=== clearness(×0.7) + 阴雨天 ===
+  rain precip>0.0 ×0.5 shift=-133 n=4167 MAE=1495.20
+  rain precip>0.0 ×0.7 shift=-186 n=4167 MAE=1494.10
+  rain precip>0.0 ×1.0 shift=-266 n=4167 MAE=1493.66
+  rain precip>0.1 ×0.5 shift=+0 n=0 MAE=1500.68
+  rain precip>0.1 ×0.7 shift=+0 n=0 MAE=1500.68
+  rain precip>0.1 ×1.0 shift=+0 n=0 MAE=1500.68
+  rain precip>0.5 ×0.5 shift=+0 n=0 MAE=1500.68
+  rain precip>0.5 ×0.7 shift=+0 n=0 MAE=1500.68
+  rain precip>0.5 ×1.0 shift=+0 n=0 MAE=1500.68
+
+=== clearness 扩展小时窗 ===
+  @ 10-15 thr>0.8 ×0.7 shift=+908 n=988 MAE=1500.90
+  @ 11-13 thr>0.8 ×0.7 shift=+1235 n=713 MAE=1505.05
+  @ 12-14 thr>0.8 ×0.7 shift=+1103 n=500 MAE=1497.85
+
+=== 最优组合 ===
+  clear×0.7 + rain(>0)×0.5 shift=-133 n=4167 MAE=1495.20
+  clear>0.8×0.7 + clear>0.6×0.3 MAE=1501.10

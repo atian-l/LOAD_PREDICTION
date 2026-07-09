@@ -1,0 +1,133 @@
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+      OOF 点数=22947  hour_bias 范围=[-835, 682]
+      drift_corr[pl_weather_residual] 午间β=[(11, np.float64(-0.0869)), (12, np.float64(-0.092)), (13, np.float64(-0.0729)), (14, np.float64(-0.0639))]
+      threshold_corr[clearness>0.8, h[11, 12, 13, 14]] n=1152 shift=+1089.0
+      threshold_corr[precip>0.0, 全天] n=6780 shift=-266.2
+=== 总体 ===
+  模型 val MAE = 1493.66  bias=-104.4
+  pred_load-only MAE = 1660.43  (headroom: 模型已降 166.8)
+  目标 1300 → 需再降 193.7 MW
+  q50/q90/q95/q99 = [ 833.  3777.6 5300.7 8728.4]
+
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+=== 按 hour ===
+         grp      n  val_bias  val_MAE  oof_bias  (oof_bias 可迁移候选)
+          11    428   -1295.3   3065.2    -456.8
+          13    428     -96.9   2974.4       1.4
+          12    428    -404.2   2907.5      27.0
+          10    428    -287.7   2881.8      73.5
+           9    428    -390.0   2863.3      73.5
+          14    428     644.4   2697.7     153.3
+           8    428    -438.0   2347.8      71.6
+          15    428     484.2   2226.1      88.0
+           7    428    -355.9   1636.3      65.7
+          16    428     244.8   1618.0      88.0
+          17    428     233.3   1146.9      89.6
+          22    428     -98.6    926.7     101.3
+           6    428    -253.6    913.1      65.7
+          18    428     208.0    837.7      90.2
+          21    428     180.7    830.5     101.3
+          23    428    -236.5    830.3     105.5
+          20    428      59.5    804.2      98.6
+          19    428      80.2    766.7      90.2
+           5    428    -182.0    641.0      64.3
+           0    428    -114.6    625.2      57.7
+           1    428    -126.6    615.9      57.9
+           4    428    -144.7    565.1      60.1
+           2    428     -76.4    564.5      59.6
+           3    428    -140.1    561.7      60.1
+
+=== 按 month ===
+         grp      n  val_bias  val_MAE  oof_bias  (oof_bias 可迁移候选)
+           3   2976    -628.2   1568.8     295.5
+           5   2976     373.8   1491.2    1018.8
+           4   2880    -145.8   1304.4     994.2
+           6   1440      72.6   1722.0       nan
+
+=== 按 dow ===
+         grp      n  val_bias  val_MAE  oof_bias  (oof_bias 可迁移候选)
+           6   1536     282.5   1720.6     234.5
+           2   1440     -93.8   1624.7    -291.9
+           0   1536      78.4   1493.5     358.0
+           1   1440    -296.1   1572.5    -101.6
+           5   1440      53.3   1361.7     294.3
+           4   1440    -463.6   1348.5    -334.3
+           3   1440    -329.6   1319.0     227.9
+
+=== 按 clearness ===
+         grp      n  val_bias  val_MAE  oof_bias  (oof_bias 可迁移候选)
+     0.5~0.8   2275     149.7   2146.8     792.8
+        <0.2   5320    -122.0    800.2     -77.5
+       >=0.8   1591    -167.6   2207.7     346.5
+     0.2~0.5   1086    -458.0   2476.2    -835.5
+
+=== 按 precip ===
+         grp      n  val_bias  val_MAE  oof_bias  (oof_bias 可迁移候选)
+       <0.01  10037     -93.5   1475.0      37.4
+      >=0.01    235    -570.4   2288.9     655.5
+
+=== 按 temp ===
+         grp      n  val_bias  val_MAE  oof_bias  (oof_bias 可迁移候选)
+          <5  10272    -104.4   1493.7      53.6
+
+=== 按 irrad ===
+         grp      n  val_bias  val_MAE  oof_bias  (oof_bias 可迁移候选)
+     400~800   2260     270.1   2560.1    1191.1
+        <100   5807    -118.3    803.3     -57.6
+     100~400   1737    -357.4   2154.9    -282.3
+       >=800    468    -802.2   2455.4   -1778.7
+
+=== 按 pl_level ===
+         grp      n  val_bias  val_MAE  oof_bias  (oof_bias 可迁移候选)
+  <57836.4825   2568    -457.4   1919.5     916.1
+  >=68892.35   2568    -110.9   1608.2    -933.8
+  62022.575~68892.35   2568     181.2   1407.0     -89.9
+  57836.4825~62022.575   2568     -30.5   1040.0     239.4
+
+=== 按 is_holiday ===
+  holiday=0 n=9504 val_bias=-104.1 val_MAE=1510.0 oof_bias=-64.4
+  holiday=1 n=768 val_bias=-107.8 val_MAE=1291.0 oof_bias=1110.6
+
+=== 偏置最大的 15 天 ===
+              mean  count     abs
+d                                
+2026-05-20  5524.0     96  5524.0
+2026-03-03 -4181.0     96  4181.0
+2026-05-17  3716.0     96  3716.0
+2026-03-04 -3591.0     96  3591.0
+2026-03-01 -3444.0     96  3444.0
+2026-04-13  3392.0     96  3392.0
+2026-03-02 -2858.0     96  2858.0
+2026-06-07  2694.0     96  2694.0
+2026-05-19  2423.0     96  2423.0
+2026-04-12  2363.0     96  2363.0
+2026-06-09 -2161.0     96  2161.0
+2026-03-05 -2156.0     96  2156.0
+2026-04-09 -1972.0     96  1972.0
+2026-05-15 -1951.0     96  1951.0
+2026-03-09  1946.0     96  1946.0

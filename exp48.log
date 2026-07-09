@@ -1,0 +1,13 @@
+building ...
+  n_feat=126  usable=75840
+training full ensemble (BI=80) + 3-fold OOF ...
+  no-bias=1530.82  +3fold-per-hour=1526.86
+== (A) 逐小时 β·pl_wr ==
+  +per-hour+β_hourly·pl_wr=1549.00  (delta=+22.13)  非零β=[(0, np.float64(-0.0165)), (1, np.float64(-0.0243)), (2, np.float64(-0.0299)), (3, np.float64(-0.0344)), (4, np.float64(-0.0322)), (5, np.float64(0.0011)), (6, np.float64(0.023)), (7, np.float64(-0.0237)), (8, np.float64(-0.0635)), (9, np.float64(-0.0711)), (10, np.float64(-0.0779)), (11, np.float64(-0.0864)), (12, np.float64(-0.0915)), (13, np.float64(-0.0731)), (14, np.float64(-0.0641)), (15, np.float64(-0.0594)), (16, np.float64(-0.0555)), (17, np.float64(-0.0462)), (18, np.float64(-0.0432)), (19, np.float64(-0.0464)), (20, np.float64(-0.0437)), (21, np.float64(-0.0316)), (22, np.float64(-0.013))]
+== (B) 午间(10-14)多元 ==
+  +per-hour+midday多元=1518.13  (delta=-8.73)
+== (C) 全天逐小时多元 ==
+  +per-hour+全天多元=1580.89  (delta=+54.02)
+  -> 最佳: B-midday (1518.13)
+  场景: 午间(11-13) MAE=3102  非午间=1292  白天(8-16)=2670  夜间=827
+done.

@@ -1,0 +1,29 @@
+building ...
+n_feat=91
+== num_leaves ==
+  nl=63 ¦Ë0.8: VAL MAE=1558.21
+  nl=127 ¦Ë0.8: VAL MAE=1554.40
+  nl=255 ¦Ë0.8: VAL MAE=1556.24
+  nl=511 ¦Ë0.8: VAL MAE=1556.24
+== ¦Ë sweep (nl=127) ==
+  ¦Ë0.7: VAL MAE=1558.73
+  ¦Ë0.8: VAL MAE=1554.40
+  ¦Ë0.85: VAL MAE=1553.17
+  ¦Ë0.9: VAL MAE=1552.66
+  ¦Ë0.95: VAL MAE=1552.75
+  ¦Ë1.0: VAL MAE=1553.50
+== min_data (nl=127, ¦Ë0.8) ==
+  mdl=200: VAL MAE=1558.00
+  mdl=300: VAL MAE=1554.40
+  mdl=500: VAL MAE=1559.29
+  mdl=800: VAL MAE=1564.44
+== lambda_l2 (nl=127, ¦Ë0.8) ==
+  l2=0.5: VAL MAE=1553.67
+  l2=1.0: VAL MAE=1554.40
+  l2=2.0: VAL MAE=1553.34
+  l2=5.0: VAL MAE=1554.71
+== learning_rate (nl=127, ¦Ë0.8) ==
+  lr=0.01 bi=442: VAL MAE=1554.96
+  lr=0.02 bi=221: VAL MAE=1554.40
+  lr=0.03 bi=147: VAL MAE=1553.28
+  lr=0.05 bi=88: VAL MAE=1555.21

@@ -1,0 +1,13 @@
+building ...
+training final ensemble ...
+  no-bias:           VAL MAE=1554.46
+computing OOF ...
+  +hour win=alld         : VAL MAE=1549.47
+  +hour win=180d         : VAL MAE=1547.59
+  +hour win=365d         : VAL MAE=1549.47
+  +dow win=alld          : VAL MAE=1562.46
+  +dow win=180d          : VAL MAE=1588.59
+  +dow win=365d          : VAL MAE=1562.46
+  +hour_dow win=alld     : VAL MAE=1554.79
+  +hour_dow win=180d     : VAL MAE=1574.05
+  +hour_dow win=365d     : VAL MAE=1554.79

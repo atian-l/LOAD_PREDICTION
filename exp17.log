@@ -1,0 +1,16 @@
+building ...
+training full ensemble (24 members, aw5.0) ...
+
+=== ¦Ë sweep (median agg) ===
+  ¦Ë=0.6: 1577.50
+  ¦Ë=0.7: 1572.32
+  ¦Ë=0.8: 1569.48
+  ¦Ë=0.9: 1569.48
+  ¦Ë=1.0: 1572.34
+  best ¦Ë=0.8 -> 1569.48
+
+computing 3-fold OOF ...
+OOF n=22947 MAE=1566.55
+[+ per-hour bias      ] VAL MAE=1561.93
+[+ per-month bias     ] VAL MAE=1645.52
+[+ per-(month,hour)   ] VAL MAE=1623.63
