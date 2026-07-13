@@ -1,6 +1,7 @@
 import numpy as np
 import heapq
-#动画的哈苏
+def aaa():
+    print(111)
 #输入一个有向图和两个点，输出最短距离，djstar算法实现
 def dijkstra_algorithm(graph, start, end):
     # 初始化距离字典，所有节点的距离设为无穷大，起点距离设为0
