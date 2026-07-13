@@ -228,7 +228,9 @@ class EnsembleModel:
                       tcn_config.get("num_channels", [64, 64, 64, 64]),
                       tcn_config.get("kernel_size", 7),
                       tcn_config.get("dropout", 0.1))
-            state = torch.load(p, map_location=obj.device)
+            # PyTorch 2.6+ 起 torch.load 默认 weights_only=True；state_dict 仅含张量，
+            # 显式指定以明示"只加载权重"且版本安全（2.8.0 / 2.12 均验证）。
+            state = torch.load(p, map_location=obj.device, weights_only=True)
             tcn.load_state_dict(state)
             tcn.to(obj.device)
             tcn.eval()
