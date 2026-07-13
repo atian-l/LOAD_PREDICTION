@@ -121,6 +121,8 @@ TRAIN_CONFIG = {
     # 长程信息已由 PRED_LAGS=[96,192,288,672] 等滞后特征编码，TCN 在此之上做局部时序平滑。
     "learning_rate": 1e-3,               # Adam 学习率（≈ LightGBM learning_rate 的对偶）
     "weight_decay": 1e-5,                # L2 正则（≈ LightGBM lambda_l2）
+    "lr_schedule": "cosine",             # LR 调度器：cosine 退火到 eta_min（Tier1 调优）；"none"=恒定
+    "lr_eta_min": 1e-5,                  # cosine 退火终点学习率
     "num_channels": [64, 64, 64, 64],    # 各残差块通道数（=块数决定深度与感受野）
     "kernel_size": 7,                    # 因果卷积核长
     "dropout": 0.1,                      # 残差块内 Dropout（正则）
@@ -152,7 +154,7 @@ TRAIN_CONFIG = {
     "best_it_num_iterations": 200,   # TCN walk-forward 上限 epochs（best_it_fixed 启用时未用）
     "best_it_early_stopping": 20,   # walk-forward 早停耐心（best_it_fixed 启用时未用）
     # ---- 固定 epochs（与 v6 best_it_fixed=80 同源哲学：固定保守迭代，不在 val 早停）----
-    "best_it_fixed": 60,            # TCN 固定训练 epochs
+    "best_it_fixed": 120,           # TCN 固定训练 epochs（Tier1：60 未收敛，loss 仍下降，提至 120）
     # ---- 小时偏置校正粒度（v6 exp75；模型无关）----
     # hour_bias 由 3 折 OOF 残差逐 slot 估计（无泄露）。96=逐 15min slot。
     # exp75: 24->1461.63, 96->1459.06（-2.57 MW）。模型按 len 自适应索引。

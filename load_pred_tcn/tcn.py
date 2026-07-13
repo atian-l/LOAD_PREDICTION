@@ -217,9 +217,16 @@ def train_tcn(X, y, w_full, usable, feat_cols, cfg, loss_type, alpha, seed, devi
     with torch.no_grad():
         model.target_mean.fill_(target_mean)
         model.target_std.fill_(target_std)
+    epochs = int(cfg["best_it_fixed"]) if epochs is None else int(epochs)
     opt = torch.optim.Adam(model.parameters(), lr=float(cfg["learning_rate"]),
                            weight_decay=float(cfg["weight_decay"]))
-    epochs = int(cfg["best_it_fixed"]) if epochs is None else int(epochs)
+    # LR 调度器（Tier1 调优）：cosine 退火，lr 从 learning_rate 衰减到 lr_eta_min
+    sched_name = str(cfg.get("lr_schedule", "none")).lower()
+    if sched_name == "cosine":
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            opt, T_max=epochs, eta_min=float(cfg.get("lr_eta_min", 1e-5)))
+    else:
+        scheduler = None
     batch_size = int(cfg["batch_size"])
     grad_clip = float(cfg.get("grad_clip", 5.0))
 
@@ -238,8 +245,10 @@ def train_tcn(X, y, w_full, usable, feat_cols, cfg, loss_type, alpha, seed, devi
                 torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
             opt.step()
             total += loss.item(); nb += 1
+        if scheduler is not None:
+            scheduler.step()
         if verbose and (ep % 10 == 0 or ep == epochs - 1):
-            print(f"      [tcn ep {ep+1}/{epochs}] loss={total/max(1,nb):.4f}")
+            print(f"      [tcn ep {ep+1}/{epochs}] loss={total/max(1,nb):.4f} lr={opt.param_groups[0]['lr']:.2e}")
     model.eval()
     return model, feat_mean, feat_std
 
