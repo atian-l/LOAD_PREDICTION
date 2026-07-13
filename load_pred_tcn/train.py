@@ -115,6 +115,7 @@ def train_ensemble(times, X, pred_load, actual, usable, cfg, best_it, mos_model=
 
     n = 0
     feat_mean_shared = None
+    feat_std_shared = None
     for residual in cfg["residual_modes"]:
         ytr = y_res if residual else y_dir   # 全量目标 Series（train_tcn 内部按 usable 滑窗）
         # per-mode best_iter：best_it 为 dict{False:direct_it, True:residual_it} 时按模式取（exp81）；
@@ -129,15 +130,17 @@ def train_ensemble(times, X, pred_load, actual, usable, cfg, best_it, mos_model=
                 for s in cfg["seeds"]:
                     loss_type = "quantile" if obj == "quantile" else "regression"
                     alpha = qa if qa is not None else 0.5
-                    tcn, feat_mean = train_tcn(X=X, y=ytr, w_full=w_full, usable=usable,
+                    tcn, feat_mean, feat_std = train_tcn(X=X, y=ytr, w_full=w_full, usable=usable,
                                                feat_cols=feat_cols, cfg=cfg,
                                                loss_type=loss_type, alpha=alpha, seed=s,
                                                epochs=nit, device=device, verbose=(n == 0))
                     model.add_member(tcn, is_residual=residual)
                     if feat_mean_shared is None:
                         feat_mean_shared = feat_mean
+                        feat_std_shared = feat_std
                     n += 1
     model.feat_mean = feat_mean_shared
+    model.feat_std = feat_std_shared
     print(f"      集成成员数: {n}  (device={device})")
     return model
 

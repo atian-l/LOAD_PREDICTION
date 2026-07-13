@@ -79,6 +79,11 @@ python -m load_pred_tcn.predict --run-date 2026-05-18 --run-hour 21
   `PRED_LAGS=[96,192,288,672]` 滞后特征编码，TCN 在此之上做局部时序平滑。
 - **训练**：滑窗 mini-batch（`seq_len=480` 即 5 天窗口、`stride=96` 即 1 天步长），
   逐时刻加权损失（regression=MSE，quantile=pinball）；窗口前 RF 步上下文不完整，不计入损失。
+- **标准化（关键）**：与 LightGBM 不同，神经网络对输入/目标尺度敏感。原始 `pred_load~60000` 会
+  使 4 层卷积激活值爆炸（loss 飙到 ~1e11、val MAE ~7540）。故训练折内对特征做**逐列标准化**
+  （`feat_mean`/`feat_std`，NaN 用列均值填充后再标准化），对目标做**逐成员标准化**
+  （`target_mean`/`target_std` 存为 TCN buffer），推理时反标准化还原到原负荷尺度。标准化统计量
+  仅由训练折计算 -> 不引入未来信息（满足不变量 #5）。
 - **推理**：全序列因果前向，分块（块间 RF 重叠）避免长序列 OOM；predict 的 14 天回看窗
   （>672+96）使 D+1 特征与训练位等价（skew 修正），并为 TCN 提供充足回看上下文。
 - **集成**：40 成员结构与 v6 完全一致；quantile 成员用 pinball 损失替代 LightGBM quantile 目标。
@@ -89,8 +94,11 @@ python -m load_pred_tcn.predict --run-date 2026-05-18 --run-hour 21
 
 1. **路径写在本包内**：为不修改 `load_pred_tcn/` 以外的文件，模型/输出目录改为本包内
    `load_pred_tcn/models`、`load_pred_tcn/output`；数据仍读共享 `load_prediction/data/`（只读）。
-2. **NaN 列均值填充**：PyTorch 卷积不支持 NaN（LightGBM 原生支持）。用训练折内列均值填充
-   空值，是输入预处理——不改变特征定义、不引入未来信息（NaN 位置由历史可得性决定）。
+2. **NaN 列均值填充 + 特征/目标标准化**：PyTorch 卷积不支持 NaN（LightGBM 原生支持）。用训练折
+   内列均值填充空值，再做逐列标准化（`feat_mean`/`feat_std`）与逐成员目标标准化
+   （`target_mean`/`target_std`）。二者均为输入预处理，不改变特征定义、不引入未来信息（NaN 位置与
+   标准化统计量均由历史可得性/训练折决定）。**这是云上首轮 val MAE=7540 的根因修复**：未标准化时
+   `pred_load~60000` 使卷积激活爆炸；标准化后 loss 回到 ~O(1)、预测回到 ~60000 正常尺度。
 3. **TCN walk-forward 未实现**：`_walk_forward_best_iters` 在 `best_it_fixed` 启用时不被调用
    （生产路径）；仅当显式置 `best_it_fixed=None` 时会抛 `NotImplementedError` 提示需自实现
    逐 epoch 验证 MAE 早停。

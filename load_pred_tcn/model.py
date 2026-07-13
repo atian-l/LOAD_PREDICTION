@@ -40,6 +40,7 @@ class EnsembleModel:
                  trim_frac: float = 0.2,
                  mos_model=None,
                  feat_mean: np.ndarray | None = None,
+                 feat_std: np.ndarray | None = None,
                  tcn_config: dict | None = None,
                  device: str = "auto"):
         self.feature_cols = feature_cols
@@ -67,8 +68,10 @@ class EnsembleModel:
         # exp80: direct+residual@MOS_enrich 较 @pred_load -9.86 MW。无泄露（actual 仅作 MOS 目标）。
         self.mos_model = mos_model
         # ---- TCN 专用 ----
-        # feat_mean：训练期列均值，用于推理时 NaN 填充（PyTorch 卷积不支持 NaN；输入预处理，无泄露）。
+        # feat_mean/feat_std：训练期特征列均值/标准差，用于推理时 NaN 填充 + 标准化
+        # （神经网对尺度敏感；NaN 填 feat_mean 后标准化为 0。输入预处理，无泄露）。
         self.feat_mean = None if feat_mean is None else np.asarray(feat_mean, dtype=np.float32)
+        self.feat_std = None if feat_std is None else np.asarray(feat_std, dtype=np.float32)
         # tcn_config：重建 TCN 架构所需 {num_channels, kernel_size, dropout}（load 时用）。
         self.tcn_config = tcn_config or {}
         self.device = get_device(device)
@@ -110,11 +113,12 @@ class EnsembleModel:
         # 残差锚：两级系统 Stage1 MOS 的 corrected_pred（较 raw pred_load 更接近 actual；exp80 -9.86 MW）。
         # 无 MOS 时回退到 raw pred_load（向后兼容）。直接成员不受锚影响（预测 actual 本身）。
         anchor = self.mos_model.transform(X) if self.mos_model is not None else pl
-        # TCN 输入：X[feature_cols] -> [T, C] 数组（NaN 由 predict_tcn 内部用 feat_mean 填充）
+        # TCN 输入：X[feature_cols] -> [T, C] 数组（predict_tcn 内部用 feat_mean/feat_std 标准化、
+        # NaN 填均值；输出用成员 target_mean/target_std 反标准化回原始量纲）
         X_arr = X[self.feature_cols].to_numpy(dtype=np.float32)
         member_preds = np.empty((len(self.members), len(X)), dtype=float)
         for i, (tcn, is_res) in enumerate(zip(self.members, self.member_residual)):
-            raw = predict_tcn(tcn, X_arr, self.feat_mean, self.device)   # [T]
+            raw = predict_tcn(tcn, X_arr, self.feat_mean, self.feat_std, self.device)   # [T]
             member_preds[i] = anchor + raw if is_res else raw
         ens = self._aggregate(member_preds)
         pred = anchor + self.shrinkage * (ens - anchor)
@@ -187,6 +191,7 @@ class EnsembleModel:
             "mos_model": self.mos_model,
             # TCN 专用
             "feat_mean": None if self.feat_mean is None else self.feat_mean.tolist(),
+            "feat_std": None if self.feat_std is None else self.feat_std.tolist(),
             "tcn_config": self.tcn_config,
             "device": "auto",
         }
@@ -220,6 +225,7 @@ class EnsembleModel:
                   trim_frac=bundle.get("trim_frac", 0.2),
                   mos_model=bundle.get("mos_model"),
                   feat_mean=bundle.get("feat_mean"),
+                  feat_std=bundle.get("feat_std"),
                   tcn_config=tcn_config,
                   device="auto")
         n_feat = len(obj.feature_cols)

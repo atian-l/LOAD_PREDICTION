@@ -60,7 +60,12 @@ class TemporalBlock(nn.Module):
 
 
 class TCN(nn.Module):
-    """因果膨胀卷积集成成员：[B, C, T] -> [B, T]（逐时刻标量预测）。"""
+    """因果膨胀卷积集成成员：[B, C, T] -> [B, T]（逐时刻标量预测，标准化空间）。
+
+    输入特征与目标均在训练折内标准化（神经网不像树模型对尺度不敏感；raw pred_load~6e4
+    直接送入卷积会使 4 层激活爆炸、输出层无法学到正确量级）。target_mean/target_std 为
+    该成员目标（direct=actual / residual=actual-anchor）的标准化参数，推理时反标准化。
+    """
 
     def __init__(self, n_features: int, num_channels: list[int], kernel_size: int, dropout: float = 0.1):
         super().__init__()
@@ -74,13 +79,16 @@ class TCN(nn.Module):
             blocks.append(TemporalBlock(in_ch, out_ch, kernel_size, 2 ** i, dropout))
             in_ch = out_ch
         self.network = nn.Sequential(*blocks)
-        self.head = nn.Conv1d(in_ch, 1, 1)  # 逐时刻标量
+        self.head = nn.Conv1d(in_ch, 1, 1)  # 逐时刻标量（标准化空间）
+        # 目标标准化参数（训练后由 train_tcn 设置；推理时反标准化）。作为 buffer 随 state_dict 持久化。
+        self.register_buffer("target_mean", torch.tensor(0.0))
+        self.register_buffer("target_std", torch.tensor(1.0))
 
     @property
     def receptive_field(self) -> int:
         return compute_receptive_field(self.num_channels, self.kernel_size)
 
-    def forward(self, x):  # [B, C, T] -> [B, T]
+    def forward(self, x):  # [B, C, T] -> [B, T]（标准化空间预测）
         return self.head(self.network(x)).squeeze(1)
 
 
@@ -150,7 +158,8 @@ def train_tcn(X, y, w_full, usable, feat_cols, cfg, loss_type, alpha, seed, devi
     device : torch.device
     epochs : 训练 epoch 数（None 时取 cfg["best_it_fixed"]；与 LightGBM 的 nit=best_it 对偶）
 
-    返回 (TCN, feat_mean)。feat_mean 为训练折内列均值（NaN 填充用，由调用方统一存一份）。
+    返回 (TCN, feat_mean, feat_std)。feat_mean/feat_std 为训练折内特征列均值/标准差
+    （特征标准化 + NaN 填充用，由调用方统一存一份）；目标标准化参数存于 TCN 缓冲区。
     """
     rng = np.random.default_rng(seed)
     torch.manual_seed(seed)
@@ -158,15 +167,32 @@ def train_tcn(X, y, w_full, usable, feat_cols, cfg, loss_type, alpha, seed, devi
         torch.cuda.manual_seed_all(seed)
 
     n_feat = len(feat_cols)
-    # 列均值（训练折内），用于 NaN 填充
-    Xus = X[usable][feat_cols]
-    feat_mean = np.nanmean(Xus.to_numpy(dtype=np.float64), axis=0)
+    # ---- 特征标准化参数（训练折内）----
+    Xus = X[usable][feat_cols].to_numpy(dtype=np.float64)
+    feat_mean = np.nanmean(Xus, axis=0)
     feat_mean = np.where(np.isfinite(feat_mean), feat_mean, 0.0).astype(np.float32)
+    feat_std = np.nanstd(Xus, axis=0)
+    feat_std = np.where(np.isfinite(feat_std) & (feat_std > 1e-8), feat_std, 1.0).astype(np.float32)
+    # ---- 目标标准化参数（训练折内；direct=actual / residual=actual-anchor，各成员不同）----
+    y_us = y.reindex(X.index)[usable].to_numpy(dtype=np.float64)
+    target_mean = float(np.nanmean(y_us))
+    target_std = float(np.nanstd(y_us))
+    if not np.isfinite(target_mean):
+        target_mean = 0.0
+    if not np.isfinite(target_std) or target_std < 1e-8:
+        target_std = 1.0
 
     X_arr = X[feat_cols].to_numpy(dtype=np.float32)            # [T, C]
     y_arr = y.reindex(X.index).to_numpy(dtype=np.float32)      # [T]
     w_arr = np.asarray(w_full, dtype=np.float32)               # [T]
     usable_np = np.asarray(usable, dtype=bool)
+
+    # ---- 标准化（输入预处理，无泄露：参数仅来自训练折）----
+    # 特征：NaN 先填 feat_mean -> 标准化后恰为 0（即该特征均值，中性值）
+    X_filled = np.where(np.isnan(X_arr), feat_mean[None, :], X_arr)
+    X_norm = ((X_filled - feat_mean[None, :]) / feat_std[None, :]).astype(np.float32)
+    # 目标标准化
+    y_norm = ((y_arr - target_mean) / target_std).astype(np.float32)
 
     seq_len = int(cfg["seq_len"])
     stride = int(cfg["stride"])
@@ -174,11 +200,9 @@ def train_tcn(X, y, w_full, usable, feat_cols, cfg, loss_type, alpha, seed, devi
     if seq_len <= rf:
         seq_len = rf + 32  # 保证窗口 > 感受野
 
-    wins_X, wins_y, wins_w = _extract_windows(X_arr, y_arr, w_arr, usable_np, seq_len, stride)
+    wins_X, wins_y, wins_w = _extract_windows(X_norm, y_norm, w_arr, usable_np, seq_len, stride)
     if not wins_X:
         raise RuntimeError("无可用训练窗口（连续段长度 < seq_len）；请减小 seq_len 或检查 usable。")
-    # NaN 用列均值填充（窗口级；输入预处理，无泄露）
-    wins_X = [np.where(np.isnan(wx), feat_mean[:, None], wx) for wx in wins_X]
     n_win = len(wins_X)
     # 损失掩码：窗口前 rf 步上下文不完整（左侧零填充），不计入损失
     loss_mask = np.ones(seq_len, dtype=bool)
@@ -190,6 +214,9 @@ def train_tcn(X, y, w_full, usable, feat_cols, cfg, loss_type, alpha, seed, devi
     lm = torch.from_numpy(loss_mask).to(device)          # [seq_len]
 
     model = TCN(n_feat, cfg["num_channels"], cfg["kernel_size"], cfg["dropout"]).to(device)
+    with torch.no_grad():
+        model.target_mean.fill_(target_mean)
+        model.target_std.fill_(target_std)
     opt = torch.optim.Adam(model.parameters(), lr=float(cfg["learning_rate"]),
                            weight_decay=float(cfg["weight_decay"]))
     epochs = int(cfg["best_it_fixed"]) if epochs is None else int(epochs)
@@ -203,7 +230,7 @@ def train_tcn(X, y, w_full, usable, feat_cols, cfg, loss_type, alpha, seed, devi
         total, nb = 0.0, 0
         for b in range(0, n_win, batch_size):
             bi = idx[b:b + batch_size]
-            pred = model(Xb[bi])                        # [B, seq_len]
+            pred = model(Xb[bi])                        # [B, seq_len] 标准化空间
             loss = _weighted_loss(pred[:, lm], yb[bi][:, lm], wb[bi][:, lm], loss_type, alpha)
             opt.zero_grad()
             loss.backward()
@@ -212,32 +239,38 @@ def train_tcn(X, y, w_full, usable, feat_cols, cfg, loss_type, alpha, seed, devi
             opt.step()
             total += loss.item(); nb += 1
         if verbose and (ep % 10 == 0 or ep == epochs - 1):
-            print(f"      [tcn ep {ep+1}/{epochs}] loss={total/max(1,nb):.2f}")
+            print(f"      [tcn ep {ep+1}/{epochs}] loss={total/max(1,nb):.4f}")
     model.eval()
-    return model, feat_mean
+    return model, feat_mean, feat_std
 
 
 # ---------------- 推理 ---------------- #
-def predict_tcn(model: TCN, X_arr: np.ndarray, feat_mean: np.ndarray,
+def predict_tcn(model: TCN, X_arr: np.ndarray, feat_mean: np.ndarray, feat_std: np.ndarray,
                 device: torch.device, chunk_size: int = 8192) -> np.ndarray:
-    """全序列因果前向，返回 [T] numpy。
+    """全序列因果前向，返回 [T] numpy（已反标准化到原始量纲）。
 
+    特征用训练折 feat_mean/feat_std 标准化（NaN 填 feat_mean -> 标准化后为 0）；
+    模型输出在标准化空间，用 model.target_mean/target_std 反标准化回原始负荷量纲。
     分块处理避免长序列 OOM；每块向前多取 RF 步作为上下文（块间重叠 RF），保证各块预测
-    的左侧上下文完整（因果卷积只需向后看）。NaN 用 feat_mean 填充。
+    的左侧上下文完整（因果卷积只需向后看）。
     """
     model.eval()
     T = X_arr.shape[0]
     rf = model.receptive_field
     Xf = np.where(np.isnan(X_arr), feat_mean[None, :], X_arr).astype(np.float32)
+    Xn = ((Xf - feat_mean[None, :]) / feat_std[None, :]).astype(np.float32)  # [T, C] 标准化
+    t_mean = float(model.target_mean)
+    t_std = float(model.target_std)
     out = np.empty(T, dtype=np.float32)
     with torch.no_grad():
         s = 0
         while s < T:
             e = min(s + chunk_size, T)
             cs = max(0, s - rf)                        # 多取 RF 步上下文
-            chunk = Xf[cs:e]                           # [L, C]
+            chunk = Xn[cs:e]                           # [L, C] 已标准化
             t = torch.from_numpy(chunk.T[None]).to(device).float()  # [1, C, L]
-            pred = model(t).squeeze(0).cpu().numpy()   # [L]
+            pred = model(t).squeeze(0).cpu().numpy()   # [L] 标准化空间
+            pred = pred * t_std + t_mean               # 反标准化到原始量纲
             off = s - cs
             out[s:e] = pred[off:off + (e - s)]
             s = e
