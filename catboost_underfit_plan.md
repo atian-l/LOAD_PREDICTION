@@ -1,6 +1,8 @@
 # CatBoost 欠拟合解决工程计划
 
-> 状态：规划中（未输出代码）
+> 状态：Phase 0 已执行 -> **NO-GO 铁证**，Phase 1-3 全取消
+> 结论：CatBoost 非欠拟合能力不足（best_it 80->500 train_raw 1517->1016 < LGB 1147，能拟合甚至更好），但拟合改善不迁移到 val（val_raw 1533->1566 反升）-> 瓶颈是泛化+残差规律性，非欠拟合 -> 维持 CatBoost 路径终止
+> 执行：exp_catboost_phase0.py @4090 466s，7 配置 raw trend
 > 前置：拟合诊断（exp_catboost_fit_diag.py）已确认 CatBoost l2_8 欠拟合
 > 关联：catboost_migration_plan.md / catboost-migration-progress 记忆
 
@@ -157,3 +159,25 @@ CatBoost best_it=80 train_raw=1517，LightGBM best_it=80 train_raw=1147，同样
 | Phase 3 | ~10 min | 48 min |
 
 总预算 ~50 min 4090（最坏全跑）。Phase 0 后大概率提前终止。
+
+## 12. Phase 0 执行结果（2026-07-13 @4090, 466s）
+
+| tag | best_it | train_raw | val_raw | debiased | gap | R²_tr | policy |
+|---|---|---|---|---|---|---|---|
+| sym_bi80 | 80 | 1517.3 | 1532.6 | 1524.2 | -15.3 | 0.9635 | SymmetricTree |
+| sym_bi160 | 160 | 1329.6 | 1562.7 | 1528.0 | -233.1 | 0.9704 | SymmetricTree |
+| sym_bi300 | 300 | 1167.7 | 1564.3 | 1515.1 | -396.6 | 0.9763 | SymmetricTree |
+| sym_bi500 | 500 | 1016.5 | 1566.3 | 1509.8 | -549.9 | 0.9810 | SymmetricTree |
+| loss_bi80 | 80 | 1551.2 | 1574.2 | 1574.2 | -23.1 | 0.9633 | Lossguide |
+| loss_bi300 | 300 | 1328.2 | 1586.7 | 1573.1 | -258.5 | 0.9697 | Lossguide |
+| no_bs80 | 80 | 1519.2 | 1535.2 | 1525.6 | -15.9 | 0.9634 | SymmetricTree |
+
+**判定**：
+- 对称树拟合迁移：**拟合不迁移**（train_raw 降 501 但 val_raw 反升 34）
+- Lossguide 拟合：**leaf-wise 无改善**（train_raw 1551 > 1517，更差）
+- bootstrap 根因：**bootstrap 非根因**（Δ+2 无差异）
+- **GO/NO-GO = NO-GO**
+
+**关键反转（修正 fit_diag 诊断）**：CatBoost 非欠拟合能力不足。bi300 train_raw=1167 追平 LGB 1147，bi500 train_raw=1016 < LGB 1147（拟合更好）。但同拟合水平下 val_raw 1564 >> LGB 1512（泛化差 52MW）。真问题是泛化+残差规律性，非欠拟合。"解决欠拟合"本身可行但 val 不改善，作追 v6 手段无效。
+
+**Phase 1-3 全取消**。维持 CatBoost 路径终止，回 v6 + 等新数据。

@@ -120,12 +120,12 @@ TRAIN_CONFIG = {
     # 4 个残差块 dilations=[1,2,4,8]，kernel=7 -> 感受野 RF=1+(7-1)·(1+2+4+8)=91 步(≈23h)。
     # 长程信息已由 PRED_LAGS=[96,192,288,672] 等滞后特征编码，TCN 在此之上做局部时序平滑。
     "learning_rate": 1e-3,               # Adam 学习率（≈ LightGBM learning_rate 的对偶）
-    "weight_decay": 1e-5,                # L2 正则（≈ LightGBM lambda_l2）
+    "weight_decay": 1e-4,                # L2 正则（Tier2 反过拟合：1e-5->1e-4；≈ LightGBM lambda_l2）
     "lr_schedule": "cosine",             # LR 调度器：cosine 退火到 eta_min（Tier1 调优）；"none"=恒定
     "lr_eta_min": 1e-5,                  # cosine 退火终点学习率
     "num_channels": [64, 64, 64, 64],    # 各残差块通道数（=块数决定深度与感受野）
     "kernel_size": 7,                    # 因果卷积核长
-    "dropout": 0.1,                      # 残差块内 Dropout（正则）
+    "dropout": 0.2,                      # 残差块内 Dropout（Tier2 反过拟合：0.1->0.2）
     "seq_len": 480,                      # 训练滑窗长度（15min 步，=5 天；> RF=91）
     "stride": 96,                        # 滑窗步长（=1 天，重叠采样增梯度步；勿过小致 OOM）
     "batch_size": 64,                    # 每批窗口数
@@ -154,7 +154,7 @@ TRAIN_CONFIG = {
     "best_it_num_iterations": 200,   # TCN walk-forward 上限 epochs（best_it_fixed 启用时未用）
     "best_it_early_stopping": 20,   # walk-forward 早停耐心（best_it_fixed 启用时未用）
     # ---- 固定 epochs（与 v6 best_it_fixed=80 同源哲学：固定保守迭代，不在 val 早停）----
-    "best_it_fixed": 120,           # TCN 固定训练 epochs（Tier1：60 未收敛，loss 仍下降，提至 120）
+    "best_it_fixed": 60,            # TCN 固定训练 epochs（Tier2 反过拟合：120 过拟合->回 60）
     # ---- 小时偏置校正粒度（v6 exp75；模型无关）----
     # hour_bias 由 3 折 OOF 残差逐 slot 估计（无泄露）。96=逐 15min slot。
     # exp75: 24->1461.63, 96->1459.06（-2.57 MW）。模型按 len 自适应索引。
