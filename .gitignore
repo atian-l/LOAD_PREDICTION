@@ -9,5 +9,9 @@ catboost_info/
 # Auto-sync runtime log (written by auto_sync.bat)
 auto_sync.log
 
+# Large data file exceeding GitHub's 100MB hard limit (506MB).
+# Use Git LFS if it must be tracked. Excluded so it does not block pushes.
+data/shandong_weather_15min_d1_d7.csv
+
 # NOTE: load_pred_v2~v7 archives and model artifacts (*.txt / *.pkl)
 # are intentionally kept in the repo per project decision.
