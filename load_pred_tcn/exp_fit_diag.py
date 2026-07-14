@@ -87,6 +87,8 @@ def _lgb_compare(times, X, pred_load, actual, usable, val_m, mos_model,
         print(f"  差(TCN−LGB): train_raw {d_tr:+.1f}, val_raw {d_va:+.1f}")
         if d_tr > 50:
             print("  -> TCN train_raw 显著高于 LightGBM：拟合能力更弱 -> 模型问题(算法拟合能力差)")
+        elif d_tr < -50:
+            print("  -> TCN train_raw 显著低于 LightGBM：TCN 过拟合更严重(记住训练但 val 未提升) -> 减容量/epoch/加正则")
         else:
             print("  -> 两者 train_raw 相近：拟合能力相当，val 差异来自泛化/数据，非 TCN 特有拟合不足")
     except ImportError:
@@ -165,10 +167,10 @@ def main() -> int:
     print(f"{'train (full, 含校正)':30} {m_train_full:>9.1f}")
     print(f"{'val (full, 含校正)':30} {m_val_full:>9.1f}   (vs v6 {ec.V6_VAL_MAE}, TCN基线 {ec.TCN_BASE_MAE})")
     print("-" * 78)
-    gap_to = m_train_raw - m_oof
+    gap_to = m_oof - m_train_raw   # >0 = OOF 高于 train = 过拟合(记住训练但泛化差)；<150 且 train_raw 高 = 欠拟合
     ov = m_oof - m_val_raw
-    print(f"train_raw − OOF   = {gap_to:+.1f}   (>400 过拟合; <150 欠拟合; 中间 轻度)")
-    print(f"OOF − val_raw     = {ov:+.1f}   (|<200| 泛化一致/数据信号弱; >200 训练期更难; <-200 漂移)")
+    print(f"OOF − train_raw  = {gap_to:+.1f}   (>400 过拟合; <150 且 train_raw 高=欠拟合; 中间 轻度)")
+    print(f"OOF − val_raw    = {ov:+.1f}   (|<200| 泛化一致/数据信号弱; >200 训练期更难; <-200 漂移)")
 
     print("\n分时段 MAE (raw):")
     _hour_breakdown(train_raw, a_tr, t_tr, val_raw, a_va, t_va)
@@ -183,7 +185,7 @@ def main() -> int:
     if gap_to > 400:
         print(f"  train_raw({m_train_raw:.0f}) << OOF({m_oof:.0f})：能拟合训练数据但泛化差 -> 过拟合倾向")
         print("  -> 优先 exp_regularize(+dropout/wd) + exp_capacity(减通道/层) + exp_train_dyn(减 epoch)")
-    elif gap_to < 150:
+    elif gap_to < 150 and m_train_raw > 1000:
         print(f"  train_raw({m_train_raw:.0f}) ≈ OOF({m_oof:.0f})：连训练数据都拟合不好 -> 欠拟合(能力不足)")
         print("  -> 优先 exp_capacity(增通道/层/RF) + exp_train_dyn(增 epoch/lr)")
     else:
