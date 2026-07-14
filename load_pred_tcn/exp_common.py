@@ -31,6 +31,12 @@ from .train import build_dataset, usable_mask, train_ensemble, _evaluate
 V6_VAL_MAE = 1445.62        # LightGBM v6 官方 val MAE（生产基线）
 TCN_BASE_MAE = 2027.47      # TCN 60ep/dropout0.1/wd1e-5 标准化修复后基线
 
+# 缩成员快速模式（广搜用；top 配置由用户用全量 40 成员 train.py 复跑确认）
+# SINGLE_MEM=1 成员（direct-regression）：最便宜的 WF-CV 探针，用于大网格 Stage A
+# QUICK_MEM=2 成员（direct+residual regression）：保留残差多样性，Stage B val 读数用
+SINGLE_MEM = {"seeds": [42], "objectives": ["regression"], "residual_modes": [False]}
+QUICK_MEM = {"seeds": [42], "objectives": ["regression"], "residual_modes": [False, True]}
+
 _CACHE: dict = {}
 
 
@@ -323,3 +329,63 @@ def print_table(rows: list[dict], title: str, ref_mae: float = V6_VAL_MAE,
               f"val={best['MAE']:.1f} (Δv6 {best['MAE']-ref_mae:+.1f})  "
               f"debiased={best['debiased']:.1f}  折CV={best['wfcv_cv']:.3f}  ({best['dt']:.0f}s)")
     print("=" * 78)
+
+
+# --------------------------------------------------------------------------- #
+# 两阶段 HP 搜索（HP-sweep 脚本通用）
+#   Stage A：用 SINGLE_MEM（1 成员）跑 wf_cv 做大网格廉价筛选 -> 选 wfcv_mean 最低的 top-K
+#   Stage B：top-K 用 QUICK_MEM（2 成员）跑 run_config 出 val 读数（仍快速；最终全量 40 成员由
+#            用户 train.py 复跑确认）。
+# 选择信号始终为 wfcv_mean（WF-CV），val 仅读数、不参与选择（防 val 过拟合/泄露）。
+# --------------------------------------------------------------------------- #
+def print_stage_a(stage_a: list[dict], title: str) -> None:
+    """打印 Stage A 全配置 WF-CV 表（按 wfcv_mean 升序）。"""
+    print("\n" + "-" * 78)
+    print(f"[Stage A] {title}  (1 成员 WF-CV 筛选；按 wfcv 升序)")
+    print("-" * 78)
+    print(f"{'tag':28} {'wfcv':>8} {'std':>7} {'cv':>6}   折MAE")
+    for r in sorted(stage_a, key=lambda x: x["wfcv"]):
+        folds = "[" + ",".join(f"{x:.0f}" for x in r["folds"]) + "]"
+        mark = " *" if r.get("top") else ""
+        print(f"{r['tag']:28} {r['wfcv']:>8.1f} {r['std']:>7.1f} {r['cv']:>6.3f}   {folds}{mark}")
+    print("-" * 78)
+
+
+def hp_sweep(configs: list[tuple[str, dict]], title: str,
+             single: dict | None = None, quick: dict | None = None,
+             topk: int = 3, best_it=None, ref_mae: float = V6_VAL_MAE,
+             verbose=False):
+    """两阶段 HP 搜索。
+
+    configs : [(tag, override), ...]  override 合并入 cfg（与 SINGLE/QUICK 成员覆盖合并）
+    single  : Stage A 成员覆盖（默认 SINGLE_MEM）
+    quick   : Stage B 成员覆盖（默认 QUICK_MEM）
+    topk    : Stage B 确认的配置数
+    返回 (rows_B, stage_a)：rows_B 为 run_config 结果列表，stage_a 为全配置 WF-CV 记录。
+    """
+    single = single or SINGLE_MEM
+    quick = quick or QUICK_MEM
+    build_cached()
+    # ---- Stage A：廉价 WF-CV 筛选 ----
+    stage_a = []
+    for i, (tag, ov) in enumerate(configs):
+        ov_a = {**single, **ov}
+        r = wf_cv(ov_a, best_it=best_it, verbose=verbose)
+        stage_a.append({"tag": tag, "override": ov, "wfcv": r["mean"],
+                        "std": r["std"], "cv": r["cv"], "folds": r["fold_mae"]})
+        print(f"  [A {i+1}/{len(configs)}] {tag:28} wfcv={r['mean']:.1f} "
+              f"±{r['std']:.1f} cv={r['cv']:.3f}")
+    order = sorted(stage_a, key=lambda x: x["wfcv"])
+    for r in order[:topk]:
+        r["top"] = True
+    print_stage_a(stage_a, title)
+    # ---- Stage B：top-K val 读数 ----
+    rows = []
+    for r in [x for x in order if x.get("top")]:
+        ov_b = {**quick, **r["override"]}
+        rc = run_config(r["tag"], ov_b, best_it=best_it, verbose=verbose)
+        rows.append(rc)
+        print(f"  [B] {r['tag']:28} wfcv={r['wfcv']:.1f} -> val={rc['MAE']:.1f} "
+              f"raw={rc['MAE_raw']:.1f} oof={rc['oof_mae']:.1f} ({rc['dt']:.0f}s)")
+    print_table(rows, f"{title} [Stage B: top{topk} 2成员 val 读数]", ref_mae=ref_mae)
+    return rows, stage_a
