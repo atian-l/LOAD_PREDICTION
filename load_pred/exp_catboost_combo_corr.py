@@ -33,8 +33,8 @@ from . import exp_catboost_ab as ab
 from . import exp_catboost_hp as hp
 from .exp_catboost_tier1_diag import _member_preds, _aggregate, _predict_param
 
-# 基础配置 = dw_regonly（Depthwise + reg_only + d8 + l2_8）。P1-1 若更优则改此处。
-HP_DW = {"depth": 8, "lr": 0.03, "l2": 8.0, "bagging_temp": 1.0,
+# 基础配置 = dw_regonly_d10（P1-1 最优：Depthwise + reg_only + d10 + l2_8，raw 1455.01）。
+HP_DW = {"depth": 10, "lr": 0.03, "l2": 8.0, "bagging_temp": 1.0,
          "grow_policy": "Depthwise", "max_leaves": None}
 BEST_IT = 80
 L2_8_VAL_MAE = 1477.67
