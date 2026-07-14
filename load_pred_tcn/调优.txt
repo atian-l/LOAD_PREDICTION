@@ -1,0 +1,139 @@
+门控python -m load_pred_tcn.exp_curve：root@autodl-container-b29f4496ae-f2d4ec78:~/autodl-tmp/load_prediction/load_pred_tcn# cd /root/autodl-tmp/load_prediction
+root@autodl-container-b29f4496ae-f2d4ec78:~/autodl-tmp/load_prediction# python -m load_pred_tcn.exp_curve
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+==============================================================================
+TCN 学习曲线  (held-out 折=2026-01-01~2026-02-28; 小集成 2 成员)
+  当前生产: dropout=0.1 weight_decay=1e-05
+==============================================================================
+  训练折点=70081  held-out点=5569
+
+[1] 当前配置 epoch 扫描 (dropout=0.1, wd=1e-05) ...
+
+   epoch  train_mae  foldval_mae      gap
+      10     1257.3       9516.5  -8259.3
+      20      977.6      10767.5  -9789.9
+      30      781.0      11280.4 -10499.4
+      40      650.1      11429.3 -10779.2
+      50      567.4      11266.5 -10699.1
+      60      502.7      11135.8 -10633.2
+      80      425.0      10709.1 -10284.1
+     100      371.6      10110.4  -9738.8
+     120      334.6      10056.1  -9721.5
+
+  foldval_mae 最小 @ epoch=10 -> 9516.5 (train=1257.3)
+  首次回升 @ epoch=20 -> 10767.5 (过拟合 onset，best_it_fixed 宜 ≤10)
+
+[2] dropout 正则对比 @ epoch=120 (看 gap 宽窄) ...
+   dropout  train_mae  foldval_mae      gap
+       0.1      334.6      10056.1  -9721.5  <- 当前
+       0.2      376.8      10759.9 -10383.0
+       0.3      418.9      11815.6 -11396.7
+       0.4      458.9      11533.4 -11074.5
+  (gap 越窄=过拟合越轻；foldval 越低=泛化越好)
+
+==============================================================================
+判定：
+  best_it_fixed 客观最优点 ≈ epoch 10 (foldval 最低 9517)
+  若当前 60ep 已过 onset -> 减 epoch；若未到 onset -> 可增 epoch 或先看正则对比。
+==============================================================================
+
+耗时 298s   ；  门控python -m load_pred_tcn.exp_fit_diag：root@autodl-container-b29f4496ae-f2d4ec78:~/autodl-tmp/load_prediction# python -m load_pred_tcn.exp_fit_diag
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+==============================================================================
+TCN 拟合诊断: train_raw / OOF / val_raw / val_full   (vs v6=1445.62, TCN基线=2027.47)
+==============================================================================
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+/root/autodl-tmp/load_prediction/load_pred_tcn/features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+特征数=126  训练点=75840  val点=10272
+
+[0] 标准化 sanity（feat_std / target_std 分布）...
+  feat_std: min=0.00 max=16784060.00 mean=566939.38 (应无 0/inf；pred_load 列 ~3e3)
+  member0[direct]: target_mean=64901.1 target_std=11513.0 (direct~6e4; residual 应远小)
+  member1[residual]: target_mean=0.0 target_std=2377.9 (direct~6e4; residual 应远小)
+
+[1] 训练 TCN 40 成员（usable）+ 3 折 OOF 校正估计 ...
+   成员数=40  OOF点=22947  折MAE=['2956', '1812', '7270']
+
+[2] 四类预测 (train_raw / OOF / val_raw / val_full) ...
+
+==============================================================================
+拟合诊断结果（TCN 当前配置）
+==============================================================================
+                                     MAE       R²
+train (raw, 含已见乐观)                 269.4   0.9986
+OOF (无泄露训练误差)                     3572.1         
+val (raw)                         1637.1   0.9200
+train (full, 含校正)                 1863.4
+val (full, 含校正)                   2097.4   (vs v6 1445.62, TCN基线 2027.47)
+------------------------------------------------------------------------------
+train_raw − OOF   = -3302.7   (>400 过拟合; <150 欠拟合; 中间 轻度)
+OOF − val_raw     = +1935.0   (|<200| 泛化一致/数据信号弱; >200 训练期更难; <-200 漂移)
+
+分时段 MAE (raw):
+      时段     train       val  Δ(val-tr)
+   00-06       188       715       +527
+   06-11       350      2230      +1880
+   11-14       366      2921      +2554
+   15-18       290      1816      +1526
+   18-24       209      1120       +911
+
+[3] LightGBM v6 配置同条件对比（若 lightgbm 可用）...
+      集成成员数: 40
+                  train_raw   val_raw    R²_tr  R²_val
+  TCN (cur)           269.4    1637.1   0.9986  0.9200
+  LightGBM v6        1147.1    1509.3   0.9762  0.9234
+  差(TCN−LGB): train_raw -877.7, val_raw +127.9
+  -> 两者 train_raw 相近：拟合能力相当，val 差异来自泛化/数据，非 TCN 特有拟合不足
+
+==============================================================================
+判定：
+  train_raw(269) ≈ OOF(3572)：连训练数据都拟合不好 -> 欠拟合(能力不足)
+  -> 优先 exp_capacity(增通道/层/RF) + exp_train_dyn(增 epoch/lr)
+  OOF(3572) > val_raw(1637)：训练期更难预测(数据更噪/季节差异)
+==============================================================================
+
+耗时 2873s   ；    

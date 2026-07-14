@@ -1,0 +1,8 @@
+cd /root/autodl-tmp/load_prediction/load_pred/
+
+unzip 压缩包名.zip
+
+
+
+
+

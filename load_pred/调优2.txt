@@ -1,0 +1,1438 @@
+
+第一个：root@autodl-container-b29f4496ae-f2d4ec78:~/autodl-tmp/load_prediction# python -m load_pred.exp_catboost_tier1_diag
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+==========================================================================
+CatBoost Tier1 诊断+后处理 (l2_8, best_it=80)
+  基线: l2_8 val=1477.67  v6=1445.62
+==========================================================================
+[0] 构建数据集...
+/root/autodl-tmp/load_prediction/load_pred/features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+/root/autodl-tmp/load_prediction/load_pred/features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+/root/autodl-tmp/load_prediction/load_pred/features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+/root/autodl-tmp/load_prediction/load_pred/features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+/root/autodl-tmp/load_prediction/load_pred/features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+    特征数=126  val点=10272
+[1] 训练 l2_8 official 40 成员 + OOF 3 折校正...
+    成员数=40  OOF点=22947
+    val_raw(无校正) MAE=1532.62  val_full(当前校正) MAE=1477.93
+
+==========================================================================
+[A2] 成员级误差分解（逐成员 raw val 误差）
+==========================================================================
+  类              n     MAE均      MAE min/max     max均     q99均
+  dir-q         15   1770.3 1670.1/1915.9    14175     9889
+  dir-reg        5   1685.4 1678.3/1689.4    15441     8921
+  res-q         15   1579.8 1541.6/1621.8    13497     8464
+  res-reg        5   1568.2 1554.4/1578.1    13285     8370
+  去某类后集成 raw MAE（无校正重估，仅趋势）:
+    去 dir-q      (剩25): raw MAE=1557.79
+    去 dir-reg    (剩35): raw MAE=1555.00
+    去 res-q      (剩25): raw MAE=1646.75
+    去 res-reg    (剩35): raw MAE=1552.05
+
+==========================================================================
+[A3] 时段/场景误差分布（val_full）
+==========================================================================
+  时段             n      MAE      q99      max
+  00-06       2568    619.1     3296     5820
+  06-11       2140   2082.2     8950    12359
+  11-14       1284   2821.6    10971    12932
+  15-18       1284   1692.6     7639     9703
+  18-24       2568    861.2     3938     6766
+  场景                                 n      MAE    基线MAE     比值
+  clear_noon clr>0.8@11-14         766   2373.8   1186.0   2.00
+  cloudy_noon clr[0.2,0.5)@11-14   218   3968.7   1186.0   3.35
+  rainy precip>0                  4167   1782.1   1186.0   1.50
+  cold temp<8                     1500   1584.0   1186.0   1.34
+  baseline(非场景)                   4848   1186.0   1186.0   1.00
+  Top20 误差点:
+     1. 2026-03-03 11:45:00  actual=74579 pred=61647 err=-12932
+     2. 2026-03-03 12:00:00  actual=73340 pred=60921 err=-12419
+     3. 2026-04-13 10:45:00  actual=52019 pred=64378 err=+12359
+     4. 2026-03-03 11:15:00  actual=78550 pred=66204 err=-12346
+     5. 2026-03-03 11:30:00  actual=76643 pred=64336 err=-12307
+     6. 2026-04-13 10:30:00  actual=52458 pred=64704 err=+12246
+     7. 2026-03-03 12:15:00  actual=72735 pred=60653 err=-12082
+     8. 2026-03-03 11:00:00  actual=79777 pred=67880 err=-11897
+     9. 2026-04-13 12:30:00  actual=44894 pred=56650 err=+11756
+    10. 2026-05-17 10:15:00  actual=51959 pred=63661 err=+11702
+    11. 2026-04-13 10:15:00  actual=53623 pred=65294 err=+11670
+    12. 2026-05-17 10:45:00  actual=51424 pred=63014 err=+11590
+    13. 2026-03-03 12:45:00  actual=72366 pred=60801 err=-11565
+    14. 2026-05-17 10:30:00  actual=51364 pred=62897 err=+11532
+    15. 2026-03-03 13:00:00  actual=73001 pred=61552 err=-11449
+    16. 2026-05-17 10:00:00  actual=52012 pred=63376 err=+11364
+    17. 2026-03-03 12:30:00  actual=72394 pred=61049 err=-11345
+    18. 2026-05-19 14:45:00  actual=66886 pred=78210 err=+11324
+    19. 2026-04-13 12:15:00  actual=44212 pred=55504 err=+11292
+    20. 2026-03-03 13:15:00  actual=72751 pred=61684 err=-11067
+
+==========================================================================
+[A4] 残差可校正性上界（oracle 96-slot 去偏）
+==========================================================================
+  val_raw(无校正)     MAE = 1532.62
+  val_full(当前校正)  MAE = 1477.93   (当前校正收益 +54.69)
+  debiased_oracle     MAE = 1502.35   (剩余校正空间 -24.42)
+  v6=1445.62  l2_8基线=1477.67
+  -> oracle 天花板 1502 > v6 1445.62：校正无望追平 v6，G2 recency 收益有限
+
+==========================================================================
+[F1] 聚合方式扫描（复用 official members，校正不重估 -> 仅快速筛选）
+==========================================================================
+  聚合                  val MAE      q99      max     Bias
+  median              1477.93     8703    12932     +8.7
+  mean                1474.20     8658    12951   +151.7
+  trimmed:0.1         1473.02     8671    12950   +113.1
+  trimmed:0.2         1472.85     8668    12960    +78.9
+  trimmed:0.3         1473.24     8691    12961    +49.9
+
+==========================================================================
+[F2] shrinkage λ 扫描（median 聚合，校正不重估）
+==========================================================================
+      λ    val MAE      q99     Bias
+    0.5    1506.02     8607    -44.4
+    0.7    1492.62     8674    -23.2
+    1.0    1477.93     8703     +8.7
+    1.2    1471.72     8724    +30.0
+    1.5    1469.58     8646    +61.9
+
+==========================================================================
+[G5] 上界 clip 扫描（median, λ=1.0）
+==========================================================================
+  actual: max=87885 p99=80105
+  上界                  val MAE      q99  max(pred)
+  None(当前)            1477.93     8703      84936
+  80000               1479.88     8703      80000
+  75000               1513.11     8905      75000
+  70000               1910.50    10688      70000
+  actual_p99          1479.83     8703      80105
+  max*1.2             1477.93     8703      84936
+  max*1.3             1477.93     8703      84936
+
+==========================================================================
+Tier1 诊断+后处理完成  耗时 94s
+==========================================================================             第二个：root@autodl-container-b29f4496ae-f2d4ec78:~/autodl-tmp/load_prediction# python -m load_pred.exp_catboost_recency_bias
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+==========================================================================
+CatBoost G2: recency-weighted hour_bias (l2_8, best_it=80)
+  基线: l2_8 val=1477.67  v6=1445.62
+==========================================================================
+[0] 构建数据集...
+/root/autodl-tmp/load_prediction/load_pred/features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+/root/autodl-tmp/load_prediction/load_pred/features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+/root/autodl-tmp/load_prediction/load_pred/features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+/root/autodl-tmp/load_prediction/load_pred/features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+/root/autodl-tmp/load_prediction/load_pred/features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+    特征数=126  val点=10272
+[1] 训练 official 40 成员 + OOF 3 折校正...
+Warning: less than 75% GPU memory available for training. Free: 1075.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2523.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 3831.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7325.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8165.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8923.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9607.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10225.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10783.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11287.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11741.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12151.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12521.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12853.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13155.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13425.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13671.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13893.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14093.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14273.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14437.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.75 Total: 32109.25
+    成员数=40  OOF点=22947
+    等权 hour_bias val MAE=1477.72
+
+==========================================================================
+[2] recency-weighted hour_bias 对比（drift/threshold 不变）
+==========================================================================
+  方案                        val MAE      Δ基线      q99     Bias           bias范围
+  equal(基线)                 1477.72    +0.00     8704     +9.2 [-822,802]
+  cont_decay 0.5+1.5tn      1482.32    +4.61     8633   +152.8 [-1037,504]
+  fold[1,1.5,2.5]           1482.91    +5.19     8622   +169.5 [-1076,495]
+  fold[1,2,4]               1490.73   +13.01     8615   +245.6 [-1201,491]
+  fold[1,1,2]               1480.44    +2.72     8652   +134.1 [-1046,598]
+  winter_only x3            1488.06   +10.34     8585   +218.1 [-1208,496]
+
+[3] OOF 残差折间漂移诊断
+  春2025: n=8737  残差均值=+514.6  |残差|均值=1533.5  残差q99=7888
+  秋2025: n=8641  残差均值=-62.4  |残差|均值=1620.3  残差q99=8631
+  冬2026: n=5569  残差均值=-616.2  |残差|均值=2080.1  残差q99=11290
+
+==========================================================================
+G2 recency-hour_bias 完成  耗时 112s
+==========================================================================
+root@autodl-container-b29f4496ae-f2d4ec78:~/autodl-tmp/load_prediction#           第三个： 
+第四个：root@autodl-container-b29f4496ae-f2d4ec78:~/autodl-tmp/load_prediction# python -m load_pred.exp_catboost_loss
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+==========================================================================
+CatBoost E: 损失/目标类扫描 (10配置, best_it=80)
+  基线: l2_8 val=1477.67  v6=1445.62
+==========================================================================
+[1] 构建数据集...
+/root/autodl-tmp/load_prediction/load_pred/features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+/root/autodl-tmp/load_prediction/load_pred/features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+/root/autodl-tmp/load_prediction/load_pred/features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+/root/autodl-tmp/load_prediction/load_pred/features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+/root/autodl-tmp/load_prediction/load_pred/features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+    特征数=126  val点=10272  配置数=10
+
+[2] 逐配置训练 + 评估 ...
+Warning: less than 75% GPU memory available for training. Free: 1075.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2523.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2523.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 3831.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 3831.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5013.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7325.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7325.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8165.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8923.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8923.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9607.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23329.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22609.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22609.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21959.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21959.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21371.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.75 Total: 32109.25
+  baseline       MAE=1477.51 Δv6=+31.89 Δl2_8=-0.16 debiased=1478.27 n=40 (182s)
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+  E1_mae_dir     MAE=1503.36 Δv6=+57.74 Δl2_8=+25.69 debiased=1492.21 n=40 (71s)
+  E1_huber2_dir  MAE=1560.50 Δv6=+114.88 Δl2_8=+82.83 debiased=1572.52 n=40 (70s)
+  E1_huber1_dir  MAE=1560.51 Δv6=+114.89 Δl2_8=+82.84 debiased=1572.53 n=40 (108s)
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+Default metric period is 5 because MAE is/are not implemented for GPU
+  E1_mae_all     MAE=1501.30 Δv6=+55.68 Δl2_8=+23.63 debiased=1491.55 n=40 (146s)
+  E2_q4060       MAE=1474.42 Δv6=+28.80 Δl2_8=-3.25 debiased=1474.35 n=40 (148s)
+  E2_q3070       MAE=1474.96 Δv6=+29.34 Δl2_8=-2.71 debiased=1472.27 n=40 (147s)
+  E2_q50only     MAE=1481.75 Δv6=+36.13 Δl2_8=+4.08 debiased=1480.58 n=20 (73s)
+  E3_reg_only    MAE=1466.02 Δv6=+20.40 Δl2_8=-11.65 debiased=1471.32 n=10 (37s)
+  E3_quant_only  MAE=1501.47 Δv6=+55.85 Δl2_8=+23.80 debiased=1491.56 n=30 (68s)
+
+==========================================================================
+E 损失/目标对比（vs l2_8 1477.67 / v6 1445.62）
+==========================================================================
+tag                 MAE      Δv6    Δl2_8  debiased    n    折CV
+baseline        1477.51   +31.89    -0.16   1478.27   40  0.138
+E1_mae_dir      1503.36   +57.74   +25.69   1492.21   40  0.185
+E1_huber2_dir   1560.50  +114.88   +82.83   1572.52   40  0.166
+E1_huber1_dir   1560.51  +114.89   +82.84   1572.53   40  0.166
+E1_mae_all      1501.30   +55.68   +23.63   1491.55   40  0.184
+E2_q4060        1474.42   +28.80    -3.25   1474.35   40  0.138
+E2_q3070        1474.96   +29.34    -2.71   1472.27   40  0.135
+E2_q50only      1481.75   +36.13    +4.08   1480.58   20  0.134
+E3_reg_only     1466.02   +20.40   -11.65   1471.32   10  0.127
+E3_quant_only   1501.47   +55.85   +23.80   1491.56   30  0.184
+
+最优: E3_reg_only  MAE=1466.02 (Δl2_8 -11.65)
+
+总耗时 1050s
+第五个：root@autodl-container-e2934d8f64-26426e61:~# cd /root/autodl-tmp/load_prediction/
+root@autodl-container-e2934d8f64-26426e61:~/autodl-tmp/load_prediction# python -m load_pred.exp_catboost_ensemble2
+==========================================================================
+CatBoost F3/F4/F5: 集成扩展 (8配置)
+  基线: l2_8 val=1477.67  v6=1445.62
+==========================================================================
+[1] 构建数据集...
+/root/autodl-tmp/load_prediction/load_pred/features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+/root/autodl-tmp/load_prediction/load_pred/features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+/root/autodl-tmp/load_prediction/load_pred/features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+/root/autodl-tmp/load_prediction/load_pred/features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+/root/autodl-tmp/load_prediction/load_pred/features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+    特征数=126  val点=10272  配置数=8
+
+[2] 逐配置训练 + 评估 ...
+Warning: less than 75% GPU memory available for training. Free: 1075.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2523.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2523.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2523.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2523.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2523.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 3831.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 3831.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5013.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23329.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22609.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22609.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21959.75 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21298.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21136.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20578.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20074.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20072.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19618.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19208.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19208.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18836.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18504.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1502.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1502.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2858.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2854.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4078.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5184.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5182.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6180.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7080.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7080.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7892.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8624.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8624.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9286.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10424.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10910.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10908.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11348.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11744.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11744.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12100.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12422.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1502.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1502.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2858.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2856.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4080.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5186.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5186.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6182.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7082.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23318.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23318.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22548.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21852.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21852.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21222.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20654.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20142.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20142.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19680.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19264.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19260.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18546.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18544.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18238.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17962.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17714.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17712.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17488.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17284.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17284.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17100.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17100.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16934.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16784.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1500.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1500.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2854.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4076.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4074.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5178.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6174.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6174.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7072.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7070.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7882.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8616.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1500.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1500.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2854.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4076.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4072.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5176.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6172.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6172.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7070.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7882.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7882.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8616.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9276.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9274.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9870.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10408.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10408.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10892.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11330.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11330.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11726.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12084.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12084.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12408.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12698.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12696.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12958.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13196.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13196.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13408.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13600.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13600.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13776.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13932.375 Total: 32109.25
+  baseline_5s      MAE=1477.68 Δv6=+32.06 Δl2_8=+0.01 debiased=1478.35 n=40 (404s)
+Warning: less than 75% GPU memory available for training. Free: 1498.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1498.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2852.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23278.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22508.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22508.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21814.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1496.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1496.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2850.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4070.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4068.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5170.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6164.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6164.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7064.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7874.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8606.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8604.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9266.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9862.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9862.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10398.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11322.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11718.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11716.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12074.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12396.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12396.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12686.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12950.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12948.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13184.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13398.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13398.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13590.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13764.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1498.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1498.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2850.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4070.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4068.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5170.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6164.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6164.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7060.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7870.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7868.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8600.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9260.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9258.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9854.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10390.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10390.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10874.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11312.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11310.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11706.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12062.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12060.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12380.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12670.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12670.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12932.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12932.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12932.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12932.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12930.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13166.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13380.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13380.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13570.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13744.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13744.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13902.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14044.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14044.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14172.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14286.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14284.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14390.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14484.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14570.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14570.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14646.375 Total: 32109.25
+  F3_seeds3        MAE=1479.08 Δv6=+33.46 Δl2_8=+1.41 debiased=1480.28 n=24 (232s)
+Warning: less than 75% GPU memory available for training. Free: 14716.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14778.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14778.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14832.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14882.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14882.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14928.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14968.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15004.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15004.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15036.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15068.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15096.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15096.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15118.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15142.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15162.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15160.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15178.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15194.375 Total: 32109.25
+  F3_seeds2        MAE=1480.68 Δv6=+35.06 Δl2_8=+3.01 debiased=1482.04 n=16 (71s)
+  F3_seeds7        MAE=1478.34 Δv6=+32.72 Δl2_8=+0.67 debiased=1479.22 n=56 (207s)
+  F4_dir80_res160  MAE=1466.96 Δv6=+21.34 Δl2_8=-10.71 debiased=1462.15 n=40 (208s)
+  F4_dir160_res80  MAE=1503.85 Δv6=+58.23 Δl2_8=+26.18 debiased=1501.60 n=40 (205s)
+  F5_mix80_160     MAE=1489.31 Δv6=+43.69 Δl2_8=+11.64 debiased=1485.40 n=40 (118s)
+  F5_mix40_80_160  MAE=1485.31 Δv6=+39.69 Δl2_8=+7.64 debiased=1484.86 n=40 (79s)
+
+==========================================================================
+F3/F4/F5 集成扩展对比（vs l2_8 1477.67 / v6 1445.62）
+==========================================================================
+tag                   MAE      Δv6    Δl2_8  debiased    n    折CV
+baseline_5s       1477.68   +32.06    +0.01   1478.35   40  0.137
+F3_seeds3         1479.08   +33.46    +1.41   1480.28   24  0.138
+F3_seeds2         1480.68   +35.06    +3.01   1482.04   16  0.140
+F3_seeds7         1478.34   +32.72    +0.67   1479.22   56  0.137
+F4_dir80_res160   1466.96   +21.34   -10.71   1462.15   40  0.139
+F4_dir160_res80   1503.85   +58.23   +26.18   1501.60   40  0.098
+F5_mix80_160      1489.31   +43.69   +11.64   1485.40   40  0.095
+F5_mix40_80_160   1485.31   +39.69    +7.64   1484.86   40  0.100
+
+最优: F4_dir80_res160  MAE=1466.96 (Δl2_8 -10.71)
+
+总耗时 1525s
+
+第六个：root@autodl-container-e2934d8f64-26426e61:~/autodl-tmp/load_prediction# python -m load_pred.exp_catboost_corr2
+==========================================================================
+CatBoost G3/G4: OOF 校正扩展 (best_it=80)
+  基线: l2_8 val=1477.67  v6=1445.62
+==========================================================================
+[1] 构建数据集...
+/root/autodl-tmp/load_prediction/load_pred/features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+/root/autodl-tmp/load_prediction/load_pred/features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+/root/autodl-tmp/load_prediction/load_pred/features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+/root/autodl-tmp/load_prediction/load_pred/features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+/root/autodl-tmp/load_prediction/load_pred/features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+    特征数=126  val点=10272
+    配置数=9
+
+[2] 逐配置训练 + 评估 ...
+Warning: less than 75% GPU memory available for training. Free: 1014.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2406.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 3664.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 3664.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4798.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5824.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5824.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6748.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7582.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 24014.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 24014.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23164.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22398.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22398.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21706.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21082.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 24014.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 24014.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23164.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22398.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22398.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21706.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21082.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21082.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20520.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20012.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20012.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19552.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19138.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19138.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18764.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18762.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18426.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18122.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18122.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17848.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17600.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23844.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23844.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23004.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22244.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1482.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1482.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2822.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4030.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4030.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5120.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6104.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6104.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6992.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7794.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23862.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23862.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23018.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22256.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22256.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21568.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20948.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20388.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20388.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19430.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19430.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19018.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18646.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18312.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18312.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18010.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17736.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17736.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17490.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17266.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17266.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17066.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16722.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16576.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16576.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16442.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16322.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16322.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16214.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16116.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16116.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16028.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15948.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15948.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15876.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15812.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23860.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23860.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23016.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22254.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22254.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21566.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20948.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20388.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20388.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19430.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19430.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19018.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19018.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18646.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18312.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18312.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18010.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17736.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17736.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17490.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17266.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17266.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17066.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16722.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16576.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16576.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16442.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16322.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16322.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16214.375 Total: 32109.25
+  G3_drift_off         MAE=1497.00 Δv6=+51.38 Δl2_8=+19.33 debiased=1498.82 折CV=0.138 (431s)
+Warning: less than 75% GPU memory available for training. Free: 16116.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16028.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 16028.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 15948.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23860.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23860.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23016.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22254.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22254.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21566.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20948.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20948.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20388.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21311.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7325.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7325.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8165.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8923.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8923.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9607.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7325.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7325.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8165.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8923.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8923.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9607.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+  G3_drift_6-9         MAE=1504.35 Δv6=+58.73 Δl2_8=+26.68 debiased=1500.40 折CV=0.137 (137s)
+  G3_drift_15-18       MAE=1506.75 Δv6=+61.13 Δl2_8=+29.08 debiased=1506.23 折CV=0.138 (72s)
+  G3_drift_allday      MAE=1524.69 Δv6=+79.07 Δl2_8=+47.02 debiased=1497.55 折CV=0.137 (72s)
+  G3_drift_pl_x_clr    MAE=1481.77 Δv6=+36.15 Δl2_8=+4.10 debiased=nan 折CV=0.137 (72s)
+  G4_thr_off           MAE=1539.97 Δv6=+94.35 Δl2_8=+62.30 debiased=1521.45 折CV=0.137 (72s)
+  G4_add_temp_gt30     MAE=1483.61 Δv6=+37.99 Δl2_8=+5.94 debiased=1485.29 折CV=0.137 (72s)
+  G4_add_clr_lt02      MAE=1476.77 Δv6=+31.15 Δl2_8=-0.90 debiased=1478.20 折CV=0.137 (73s)
+  G4_add_temp30_clr02  MAE=1482.73 Δv6=+37.11 Δl2_8=+5.06 debiased=1485.20 折CV=0.138 (72s)
+
+==========================================================================
+G3/G4 校正扩展对比（vs l2_8 1477.67 / v6 1445.62）
+==========================================================================
+tag                       MAE      Δv6    Δl2_8  debiased    折CV
+G3_drift_off          1497.00   +51.38   +19.33   1498.82  0.138
+G3_drift_6-9          1504.35   +58.73   +26.68   1500.40  0.137
+G3_drift_15-18        1506.75   +61.13   +29.08   1506.23  0.138
+G3_drift_allday       1524.69   +79.07   +47.02   1497.55  0.137
+G3_drift_pl_x_clr     1481.77   +36.15    +4.10       nan  0.137
+G4_thr_off            1539.97   +94.35   +62.30   1521.45  0.137
+G4_add_temp_gt30      1483.61   +37.99    +5.94   1485.29  0.137
+G4_add_clr_lt02       1476.77   +31.15    -0.90   1478.20  0.137
+G4_add_temp30_clr02   1482.73   +37.11    +5.06   1485.20  0.138
+
+最优: G4_add_clr_lt02  MAE=1476.77 (Δl2_8 -0.90)
+
+总耗时 1074s
+
+第七个：root@autodl-container-e2934d8f64-26426e61:~/autodl-tmp/load_prediction# python -m load_pred.exp_catboost_feat_sample
+==========================================================================
+CatBoost H1/H2/H3/H4: 特征+样本类扫描 (best_it=80)
+  基线: l2_8 val=1477.67  v6=1445.62
+==========================================================================
+[1] 构建数据集...
+/root/autodl-tmp/load_prediction/load_pred/features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+/root/autodl-tmp/load_prediction/load_pred/features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+/root/autodl-tmp/load_prediction/load_pred/features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+/root/autodl-tmp/load_prediction/load_pred/features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+/root/autodl-tmp/load_prediction/load_pred/features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+    特征数=126  val点=10272
+    H1 子集: drop_q=105  drop_x=89  core=77 (全=126)
+    配置数=14
+
+[2] 逐配置训练 + 评估 ...
+Warning: less than 75% GPU memory available for training. Free: 1014.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2408.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 3666.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 3666.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4802.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5828.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5828.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6754.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7590.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1492.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1492.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2840.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4058.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4058.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5156.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6148.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6148.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7042.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7850.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1492.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1492.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2840.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1492.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1492.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2840.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1492.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1492.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2840.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4058.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4058.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5156.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6148.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6148.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7042.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7850.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7850.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8578.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9234.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9052.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9654.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10196.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10686.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10686.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11130.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11528.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11528.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11888.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12212.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12212.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12506.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12772.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12772.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13010.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13226.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23040.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22278.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22278.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21590.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20970.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1484.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1484.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2824.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4032.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4032.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5124.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6110.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6110.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6998.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7800.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1484.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1484.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2824.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4032.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4032.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5124.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6110.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6110.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6998.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7800.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7800.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8524.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9178.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9178.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9768.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10300.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10300.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10780.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11214.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11214.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11604.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11958.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12278.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12278.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12566.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12826.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12826.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13060.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13270.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23884.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1484.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1484.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2824.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4032.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5429.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6455.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23329.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1506.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1478.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2842.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1506.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1504.375 Total: 32109.25
+  baseline       MAE=1477.91 Δv6=+32.29 Δl2_8=+0.24 debiased=1478.74 折CV=0.137 (409s)
+Warning: less than 75% GPU memory available for training. Free: 2864.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4092.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4090.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5198.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6192.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6192.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7088.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1498.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1496.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2850.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4072.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4070.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5174.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6168.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6166.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7066.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7876.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7874.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8606.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9268.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9266.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9862.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10400.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10400.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10878.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11310.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11310.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11698.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12048.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12048.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12364.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12650.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12650.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12908.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13140.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13140.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13350.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13540.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13540.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13710.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13864.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13864.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14004.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14004.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14130.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14242.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14060.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14172.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14272.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14272.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14362.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14444.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14444.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14518.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14518.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14586.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1480.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1480.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2818.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2818.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4026.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5116.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5116.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6100.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1480.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1480.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2818.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2818.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4026.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5116.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5116.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6100.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6988.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6988.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7788.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8583.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8583.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9301.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9301.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9949.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10533.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11061.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11061.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11537.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 11967.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12355.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12355.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 12703.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13019.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13019.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13305.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13563.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13563.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 13795.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14003.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14003.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14191.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14363.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14363.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14517.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 14655.6875 Total: 32109.25
+  H1_drop_q      MAE=1485.04 Δv6=+39.42 Δl2_8=+7.37 debiased=1484.72 折CV=0.135 (222s)
+  H1_drop_x      MAE=1485.55 Δv6=+39.93 Δl2_8=+7.88 debiased=1486.51 折CV=0.134 (71s)
+  H1_core        MAE=1489.77 Δv6=+44.15 Δl2_8=+12.10 debiased=1490.39 折CV=0.131 (68s)
+  H2_aw2.5       MAE=1483.23 Δv6=+37.61 Δl2_8=+5.56 debiased=1486.42 折CV=0.133 (76s)
+  H2_aw10.0      MAE=1481.21 Δv6=+35.59 Δl2_8=+3.54 debiased=1479.30 折CV=0.142 (133s)
+  H2_aw20.0      MAE=1477.44 Δv6=+31.82 Δl2_8=-0.23 debiased=1473.55 折CV=0.141 (160s)
+  H3_g0.0        MAE=1487.04 Δv6=+41.42 Δl2_8=+9.37 debiased=1491.29 折CV=0.128 (160s)
+  H3_g0.5        MAE=1483.35 Δv6=+37.73 Δl2_8=+5.68 debiased=1485.73 折CV=0.132 (142s)
+  H3_g1.5        MAE=1479.42 Δv6=+33.80 Δl2_8=+1.75 debiased=1477.21 折CV=0.152 (76s)
+  H3_g2.0        MAE=1502.43 Δv6=+56.81 Δl2_8=+24.76 debiased=1482.03 折CV=0.164 (135s)
+  H4_ts2023      MAE=1496.95 Δv6=+51.33 Δl2_8=+19.28 debiased=1506.41 折CV=0.134 (156s)
+  H4_ts2024h2    MAE=1499.96 Δv6=+54.34 Δl2_8=+22.29 debiased=1474.11 折CV=0.145 (131s)
+  H4_ts2025      MAE=1703.31 Δv6=+257.69 Δl2_8=+225.64 debiased=1517.58 折CV=0.107 (71s)
+
+==========================================================================
+H1/H2/H3/H4 特征+样本对比（vs l2_8 1477.67 / v6 1445.62）
+==========================================================================
+tag                 MAE      Δv6    Δl2_8  debiased    折CV
+baseline        1477.91   +32.29    +0.24   1478.74  0.137
+H1_drop_q       1485.04   +39.42    +7.37   1484.72  0.135
+H1_drop_x       1485.55   +39.93    +7.88   1486.51  0.134
+H1_core         1489.77   +44.15   +12.10   1490.39  0.131
+H2_aw2.5        1483.23   +37.61    +5.56   1486.42  0.133
+H2_aw10.0       1481.21   +35.59    +3.54   1479.30  0.142
+H2_aw20.0       1477.44   +31.82    -0.23   1473.55  0.141
+H3_g0.0         1487.04   +41.42    +9.37   1491.29  0.128
+H3_g0.5         1483.35   +37.73    +5.68   1485.73  0.132
+H3_g1.5         1479.42   +33.80    +1.75   1477.21  0.152
+H3_g2.0         1502.43   +56.81   +24.76   1482.03  0.164
+H4_ts2023       1496.95   +51.33   +19.28   1506.41  0.134
+H4_ts2024h2     1499.96   +54.34   +22.29   1474.11  0.145
+H4_ts2025       1703.31  +257.69  +225.64   1517.58  0.107
+
+最优: H2_aw20.0  MAE=1477.44 (Δl2_8 -0.23)
+
+总耗时 2011s
+
+第八个：root@autodl-container-e2934d8f64-26426e61:~/autodl-tmp/load_prediction/load_pred
+_tcn# cd /root/autodl-tmp/load_prediction
+root@autodl-container-e2934d8f64-26426e61:~/autodl-tmp/load_prediction# python -m load_pred.exp_catboost_mos2
+==========================================================================
+CatBoost I1/I2: anchor/MOS 类扫描 (best_it=80)
+  基线: l2_8 val=1477.67  v6=1445.62
+==========================================================================
+[1] 构建数据集...
+/root/autodl-tmp/load_prediction/load_pred/features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+/root/autodl-tmp/load_prediction/load_pred/features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+/root/autodl-tmp/load_prediction/load_pred/features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+/root/autodl-tmp/load_prediction/load_pred/features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+/root/autodl-tmp/load_prediction/load_pred/features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+/root/autodl-tmp/load_prediction/load_pred/features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+/root/autodl-tmp/load_prediction/load_pred/features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+    特征数=126  val点=10272
+    配置数=9
+
+[2] 逐配置重建 MOS + 训练 + 评估 ...
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7325.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7325.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8165.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+  I1_a0.1          MAE=1478.09 Δv6=+32.47 Δl2_8=+0.42 debiased=1477.84 MOS[default,a=0.1] (204s)
+Warning: less than 75% GPU memory available for training. Free: 23329.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4223.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5365.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6395.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1553.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2957.6875 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23732.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22920.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22920.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22190.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21530.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21530.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20934.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20396.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20392.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19908.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19470.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19470.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19074.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18718.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18396.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18394.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 18104.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 17842.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23322.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22552.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23320.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22550.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23314.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22544.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1500.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1500.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2856.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4080.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4080.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5184.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6180.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6180.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7080.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7892.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7892.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 8624.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9284.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9282.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 9880.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10420.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10420.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 10904.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23310.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23310.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22538.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21842.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1500.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1500.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2854.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1500.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1498.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2852.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23302.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22530.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21834.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21834.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21206.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20640.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20640.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20128.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 19666.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23290.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22518.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22518.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21822.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21194.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21194.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20628.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20118.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1498.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 1498.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 2852.375 Total: 32109.25
+  I1_a0.5          MAE=1478.37 Δv6=+32.75 Δl2_8=+0.70 debiased=1478.14 MOS[default,a=0.5] (409s)
+Warning: less than 75% GPU memory available for training. Free: 4074.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 4074.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 5178.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6172.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 6170.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 7068.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 23282.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 22512.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21818.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21818.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 21190.375 Total: 32109.25
+Warning: less than 75% GPU memory available for training. Free: 20624.375 Total: 32109.25
+  baseline         MAE=1477.92 Δv6=+32.30 Δl2_8=+0.25 debiased=1478.67 MOS[default,a=1.0] (174s)
+  I1_a5.0          MAE=1477.90 Δv6=+32.28 Δl2_8=+0.23 debiased=1478.28 MOS[default,a=5.0] (154s)
+  I1_a10.0         MAE=1476.19 Δv6=+30.57 Δl2_8=-1.48 debiased=1476.70 MOS[default,a=10.0] (153s)
+  I2_cols_minimal  MAE=1490.01 Δv6=+44.39 Δl2_8=+12.34 debiased=1489.93 MOS[5列,a=1.0] (153s)
+  I2_cols_predonly MAE=1479.66 Δv6=+34.04 Δl2_8=+1.99 debiased=1480.30 MOS[1列,a=1.0] (158s)
+  I2_cols_no_plwr  MAE=1478.93 Δv6=+33.31 Δl2_8=+1.26 debiased=1479.99 MOS[14列,a=1.0] (120s)
+  I2_cols_extended FAIL (KeyError: "['temp_day_max'] not in index")
+
+==========================================================================
+I1/I2 MOS 对比（vs l2_8 1477.67 / v6 1445.62）
+==========================================================================
+tag                   MAE      Δv6    Δl2_8  debiased    折CV
+I1_a0.1           1478.09   +32.47    +0.42   1477.84  0.135
+I1_a0.5           1478.37   +32.75    +0.70   1478.14  0.135
+baseline          1477.92   +32.30    +0.25   1478.67  0.137
+I1_a5.0           1477.90   +32.28    +0.23   1478.28  0.135
+I1_a10.0          1476.19   +30.57    -1.48   1476.70  0.136
+I2_cols_minimal   1490.01   +44.39   +12.34   1489.93  0.126
+I2_cols_predonly  1479.66   +34.04    +1.99   1480.30  0.118
+I2_cols_no_plwr   1478.93   +33.31    +1.26   1479.99  0.137
+
+最优: I1_a10.0  MAE=1476.19 (Δl2_8 -1.48)
+
+总耗时 1525s
