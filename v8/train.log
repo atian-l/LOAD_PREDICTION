@@ -1,0 +1,56 @@
+[1/8] 构建数据集（复用 load_pred.build_dataset）...
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+      特征数=126  可训练点=75840
+[2/8] OOF 3 折 walk-forward（base A + base B）...
+  [OOF] base A (v6 40 成员) 3 折 walk-forward ...
+      集成成员数: 40
+      集成成员数: 40
+      集成成员数: 40
+        base A OOF 点=22947  OOF MAE=1715.28
+  [OOF] base B (reg_only 10 成员) 3 折 walk-forward ...
+      集成成员数: 10
+      集成成员数: 10
+      集成成员数: 10
+        base B OOF 点=22947  OOF MAE=1745.32
+      OOF 池点=22947  base A OOF MAE=1715.28  base B OOF MAE=1745.32
+[3/8] correction 嵌套 2 折 OOF（trigger/α/w 估计用）...
+[4/8] 天气相似度池 + τ grid + trigger/α/w 动态估计 ...
+      τ grid 选 tau=0.5  动态修正 OOF MAE=1715.28  最差折MAE=2066.28
+      [dyn] trig_frac=0.8 min_gain=0.0 OOF base MAE=1715.28 -> 动态=1715.28 (Δ+0.00, OOF trigger命中率=0.000)
+[5/8] 全量训练 correction model（3 段）+ base B（reg_only）...
+      集成成员数: 10
+[6/8] adaptive model selection 偏好表（天气型分桶）...
+      天气型桶=10  偏好 B 的桶=0  其余=A
+[7/8] 加载 base A（v6 根 bundle）+ 组装 V8Model + 保存 ...
+      已保存: E:\01\python\SdPproject\load_prediction\v8\models\v8_bundle.pkl
+[8/8] val 评估 ...
+
+================ v8 val 评估 ================
+  MAE: 1445.621563826712
+  RMSE: 2274.4167655352717
+  Bias: -17.381075679469156
+  午间MAE(08-18): 2385.7522548698594
+  大偏差点数(>3000): 1393
+  大偏差均值: 5096.665084344066
+  N_points: 10272
+  v7_MAE参考: 1445.62
+============================================

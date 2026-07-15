@@ -245,7 +245,7 @@ class DynamicEstimator:
         self._ds_table = {}
         for d, s in uniq:
             self._ds_table[(d, s)] = self._estimate_alpha_w_frac_gain(d, s)
-        self._oof_final = self._simulate(self.trig_frac, self.min_gain)
+        self._oof_final = self._simulate(self.min_gain, tf=self.trig_frac)
         self._oof_mae = float(np.mean(np.abs(self._oof_final - self.oof["actual"])))
         self._oof_worst = self._oof_mae  # 加载路径无 fold_windows（evaluate 不用此值）
         return self

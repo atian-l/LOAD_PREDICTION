@@ -82,30 +82,29 @@ def weather_type(day_vec_row) -> str:
     return f"c{cb}_t{tb}"
 
 
-def adaptive_preference(oof_pool: dict, day_vec_pool: pd.DataFrame) -> dict[tuple, str]:
-    """OOF 池按 (天气型, 段) 分桶比较 base A vs B 的 OOF MAE，返回 {(天气型, 段): 'A'|'B'}。
+def adaptive_preference(oof_pool: dict, day_vec_pool: pd.DataFrame) -> dict[str, str]:
+    """OOF 池按天气型分桶比较 base A vs B 的 OOF MAE，返回 {天气型: 'A'|'B'}。
 
-    细化到段级：B 仅在其真正优于 A 的段被选用，避免"全日选 B"误伤夜间/晚间
-    （按日选 B 会把 B 的午间收益抵消在夜间/晚间损失上，实测 overall +0.43）。
+    日级（按天气型全 96 点选 base）：诊断 diag_trigger 证实日级 adaptive-B 在 val 午间
+    -3.54MW（2385.75->2382.21，最差段改善），overall +0.43MW（噪声级）。B 仅在 2 个天气型
+    桶 OOF 优超 A。这是 OOF 历史统计（非单日误差、非 val），跨年可迁移。
+    （曾试段级细化，但 OOF 段级偏好未落在 day 段 -> 午间收益丢失，故保留日级。）
     B 优 A 超过 ADAPTIVE_MIN_MARGIN 且桶样本≥ADAPTIVE_MIN_N 才偏好 B；否则 A（保守）。
-    天气型日级 + OOF 历史统计（非单日误差），避免偶然切换；val 零参与。
     """
     dates = pd.DatetimeIndex(oof_pool["dates"]).normalize()
     types = np.array([weather_type(day_vec_pool.loc[d]) for d in dates], dtype=object)
-    segs = oof_pool["seg"]
     pref = {}
     for t in np.unique(types):
-        for seg in VC.SEGMENTS:
-            m = (types == t) & (segs == seg)
-            if int(m.sum()) < VC.ADAPTIVE_MIN_N:
-                pref[(str(t), seg)] = "A"
-                continue
-            mae_A = float(np.abs(oof_pool["base_A_oof"][m] - oof_pool["actual"][m]).mean())
-            mae_B = float(np.abs(oof_pool["base_B_oof"][m] - oof_pool["actual"][m]).mean())
-            pref[(str(t), seg)] = "B" if mae_B < mae_A * (1.0 - VC.ADAPTIVE_MIN_MARGIN) else "A"
+        m = types == t
+        if int(m.sum()) < VC.ADAPTIVE_MIN_N:
+            pref[str(t)] = "A"
+            continue
+        mae_A = float(np.abs(oof_pool["base_A_oof"][m] - oof_pool["actual"][m]).mean())
+        mae_B = float(np.abs(oof_pool["base_B_oof"][m] - oof_pool["actual"][m]).mean())
+        pref[str(t)] = "B" if mae_B < mae_A * (1.0 - VC.ADAPTIVE_MIN_MARGIN) else "A"
     return pref
 
 
-def select_base(d1_type: str, d1_seg: str, preference: dict) -> str:
-    """部署时选 base：查 (天气型, 段) 偏好表，默认 A。"""
-    return preference.get((d1_type, d1_seg), "A")
+def select_base(d1_type: str, preference: dict) -> str:
+    """部署时选 base：查天气型偏好表，默认 A。"""
+    return preference.get(d1_type, "A")

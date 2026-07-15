@@ -62,13 +62,14 @@ class V8Model:
         base_A_pred = self.base_A.predict_load(X, pred_load)
         base_B_pred = self.base_B.predict_load(X, pred_load)
 
-        # 日级天气向量 + adaptive base 选择（(天气型, 段) 级，B 仅在其更优的段选用）
+        # 日级天气向量 + adaptive base 选择（日级：按天气型全 96 点选 base）
         day_vec = WS.day_weather_vectors(X, times)
         uniq_dates = np.unique(dates)
-        date_wt = {}  # date -> 天气型
+        date_sel = {}  # date -> 'A'/'B'
         for d in uniq_dates:
             d = pd.Timestamp(d).normalize()
-            date_wt[d] = BASE.weather_type(day_vec.loc[d]) if d in day_vec.index else None
+            wt = BASE.weather_type(day_vec.loc[d]) if d in day_vec.index else None
+            date_sel[d] = BASE.select_base(wt, self.adaptive_pref) if wt is not None else "A"
 
         final = np.empty(len(times), dtype=float)
         # 逐段处理：correction 预测按段批量，α/w/trigger 按 (date,seg) 缓存
@@ -87,8 +88,7 @@ class V8Model:
                 ds_cache[d] = self.dynamic.params(d, seg, q_vec=q_vec)
             for j, d in enumerate(dates_seg):
                 d = pd.Timestamp(d).normalize()
-                wt = date_wt.get(d)
-                sel = BASE.select_base(wt, seg, self.adaptive_pref) if wt is not None else "A"
+                sel = date_sel.get(d, "A")
                 base_val = base_A_pred[idx_seg[j]] if sel == "A" else base_B_pred[idx_seg[j]]
                 a, w, trig = ds_cache[d]
                 if trig and a > 0.0 and w > 0.0:

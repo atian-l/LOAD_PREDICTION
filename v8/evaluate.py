@@ -87,19 +87,25 @@ def evaluate(verbose: bool = True) -> dict:
     oof_final = v8.dynamic._oof_final
     oof_base = v8.oof_pool["base_A_oof"]
     oof_trig_rate = float(np.mean(oof_final != oof_base))
-    # val trigger 命中率（传 q_vec：val 日期不在训练天气池内，须显式给查询向量才能找邻居）
+    # val trigger：区分"raw trigger(frac>=门槛)"与"applied(trigger 且 alpha>0 且 w>0)"。
+    # applied 才真正改变预测。跨年符号翻转时 raw trigger 可触发但 best alpha<=0 ->
+    # a>0 守卫阻断 -> applied=0（v8=v7，跨年安全）。
     val_dates = pd.DatetimeIndex(times_eval[vm]).normalize()
     val_segs = SEG.segment_array(hours_val)
-    day_vec_eval = WS.day_weather_vectors(X_v7, times_eval)
+    day_vec_eval = WS.day_weather_vectors(X_v7[vm], times_eval[vm])
     ds_cache = {}
     val_trig = np.zeros(len(val_dates), dtype=bool)
+    val_applied = np.zeros(len(val_dates), dtype=bool)
     for i, (d, s) in enumerate(zip(val_dates, val_segs)):
         key = (d, s)
         if key not in ds_cache:
             q_vec = day_vec_eval.loc[d].values if d in day_vec_eval.index else None
             ds_cache[key] = v8.dynamic.params(d, s, q_vec=q_vec)
-        val_trig[i] = ds_cache[key][2]
+        al, w, trig = ds_cache[key]
+        val_trig[i] = trig
+        val_applied[i] = trig and al > 0.0 and w > 0.0
     val_trig_rate = float(np.mean(val_trig))
+    val_applied_rate = float(np.mean(val_applied))
 
     delta = m8["MAE"] - m7["MAE"]
     result = {
@@ -107,6 +113,7 @@ def evaluate(verbose: bool = True) -> dict:
         "v7_午间MAE": m7["MAE_day(08-18)"], "v8_午间MAE": m8["MAE_day(08-18)"],
         "v7_大偏差点数": m7["大偏差点数(>3000)"], "v8_大偏差点数": m8["大偏差点数(>3000)"],
         "OOF_trigger命中率": oof_trig_rate, "val_trigger命中率": val_trig_rate,
+        "val_applied命中率": val_applied_rate,
         "v7_full": m7, "v8_full": m8,
     }
 
@@ -120,7 +127,8 @@ def evaluate(verbose: bool = True) -> dict:
     for seg, k in [("night(00-08)", "MAE_night(00-08)"), ("day(08-18)", "MAE_day(08-18)"), ("evening(18-24)", "MAE_evening(18-24)")]:
         lines.append(f"   {seg}: {m7[k]:.2f} -> {m8[k]:.2f}  (Δ={m8[k]-m7[k]:+.2f})")
     lines.append("③ 跨年泛化 (trigger 命中率):")
-    lines.append(f"   OOF = {oof_trig_rate:.3f}   val = {val_trig_rate:.3f}   (一致性好则跨年可迁移)")
+    lines.append(f"   OOF raw = {oof_trig_rate:.3f}   val raw = {val_trig_rate:.3f}   val applied = {val_applied_rate:.3f}")
+    lines.append(f"   (applied=实际改变预测的点比例；raw 触发但 alpha<=0 跨年符号翻转 -> a>0 守卫阻断)")
     lines.append("④ 大偏差 (>3000MW) 点数:")
     lines.append(f"   v7 = {m7['大偏差点数(>3000)']}   v8 = {m8['大偏差点数(>3000)']}   "
                  f"(均值 {m7['大偏差均值']:.0f} -> {m8['大偏差均值']:.0f})")

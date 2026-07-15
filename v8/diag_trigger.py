@@ -54,10 +54,11 @@ def run():
     dates = pd.DatetimeIndex(times_eval).normalize()
     hours = times_eval.hour.values.astype(int)
     seg_arr = SEG.segment_array(hours)
-    date_wt = {}
+    date_sel = {}
     for d in np.unique(dates):
         d = pd.Timestamp(d).normalize()
-        date_wt[d] = VM.BASE.weather_type(day_vec.loc[d]) if d in day_vec.index else None
+        wt = VM.BASE.weather_type(day_vec.loc[d]) if d in day_vec.index else None
+        date_sel[d] = VM.BASE.select_base(wt, v8.adaptive_pref) if wt is not None else "A"
     # 各段 corr 预测（与阈值无关）
     corr_full = np.empty(len(times_eval), dtype=float)
     for seg in VC.SEGMENTS:
@@ -92,8 +93,7 @@ def run():
                     ds_cache[d] = v8.dynamic.params(d, seg, q_vec=q_vec, tf=tf)
                 for j in idx_seg:
                     d = pd.Timestamp(dates[j]).normalize()
-                    wt = date_wt.get(d)
-                    sel = VM.BASE.select_base(wt, seg, v8.adaptive_pref) if wt is not None else "A"
+                    sel = date_sel.get(d, "A")
                     base_val = base_A_pred[j] if sel == "A" else base_B_pred[j]
                     al, w, trig = ds_cache[d]
                     if trig and al > 0 and w > 0:
