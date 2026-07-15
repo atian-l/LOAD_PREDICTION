@@ -1,5 +1,7 @@
 # v8.1 Phase 0：残差溯源 + 跨年可迁移性诊断
 
+> ⚠️ 本报告的**数字是事实**，但 F 节与"方向建议"节的 **"no-go" 绝对措辞已被 [../DESIGN.md](../DESIGN.md) §5 校准为条件结论**（"当前特征下不可恢复"，非永久）。判定以 DESIGN.md 为准。
+
 残差 r = actual − base_A(v6)。r_train=2025 OOF(无泄露, N=22947)，r_val=2026 val(eval-only, N=10272)。train_mean=-262.9 MW。
 
 跨年 transfer R²：探针在 2025 残差上训练、2026 上测试，基线=2025 残差均值(do nothing)。>0 表示该分量跨年可迁移；dir_acc>0.52 表示方向可迁移。
