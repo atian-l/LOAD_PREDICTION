@@ -1,0 +1,49 @@
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:332: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["clearness_x_midday"] = clearness * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:342: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_96"] = pl_dip_96
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:343: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_672"] = irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:344: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_irrad"] = pl_dip_96 * wth["irrad"].values
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:345: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clearness"] = pl_dip_96 * clearness
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:346: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_midday"] = pl_dip_96 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:347: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_x_irrad_anom"] = pl * irrad_anom_672
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:348: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["irrad_anom_x_midday"] = irrad_anom_672 * is_midday
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
+E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+OOF base MAE=1715.42  val N=10272  v7_MAE=1445.62
+   tf     mg | OOF_trig  OOF_MAE    worst | val_trig  val_MAE  val_mid
+------------------------------------------------------------------------------
+  0.5      0 |    0.656  1690.35  1690.35 |    0.738  1466.15  2421.42
+  0.5     30 |    0.475  1691.31  1691.31 |    0.572  1465.28  2421.06
+  0.5     60 |    0.332  1692.93  1692.93 |    0.445  1466.51  2424.90
+  0.5    120 |    0.159  1698.05  1698.05 |    0.246  1458.59  2412.61
+  0.5    240 |    0.036  1706.18  1706.18 |    0.061  1451.75  2396.53
+  0.6      0 |    0.343  1693.18  1693.18 |    0.434  1465.73  2423.27
+  0.6     30 |    0.305  1693.27  1693.27 |    0.411  1465.53  2423.29
+  0.6     60 |    0.263  1693.93  1693.93 |    0.399  1465.12  2423.29
+  0.6    120 |    0.150  1698.30  1698.30 |    0.246  1458.59  2412.61
+  0.6    240 |    0.035  1706.39  1706.39 |    0.061  1451.75  2396.53
+  0.7      0 |    0.029  1711.09  1711.09 |    0.039  1448.90  2388.57
+  0.7     30 |    0.029  1711.09  1711.09 |    0.039  1448.90  2388.57
+  0.7     60 |    0.029  1711.09  1711.09 |    0.039  1448.90  2388.57
+  0.7    120 |    0.028  1711.08  1711.08 |    0.039  1448.90  2388.57
+  0.7    240 |    0.010  1712.67  1712.67 |    0.009  1449.27  2388.57
+  0.8      0 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+  0.8     30 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+  0.8     60 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+  0.8    120 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+  0.8    240 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+  0.9      0 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+  0.9     30 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+  0.9     60 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+  0.9    120 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+  0.9    240 |    0.000  1715.42  1715.42 |    0.000  1446.05  2382.21
+never      - |    0.000  1715.42  1715.42 |    0.000  1445.62  2385.75  (pure base A = v7)

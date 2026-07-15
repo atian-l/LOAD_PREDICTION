@@ -67,15 +67,20 @@ def run_train(verbose: bool = True) -> dict:
     day_vec_all = WS.day_weather_vectors(X_full, times)
     oof_dates = pd.DatetimeIndex(oof_pool["dates"]).normalize().unique()
     day_vec_pool = day_vec_all.loc[oof_dates].sort_index()
-    best_tau, best_mae_dyn, best_ws, best_dyn = None, None, None, None
+    fold_windows = cfg_A.get("best_it_folds")  # 3 折评估窗，minimax 跨季稳定性选 trigger/τ
+    best_tau, best_worst, best_ws, best_dyn = None, None, None, None
     for tau in VC.WEATHER_SIM_TAU_GRID:
         ws = WS.WeatherSim(k=VC.WEATHER_SIM_K, tau=tau)
         ws.fit(day_vec_pool)
-        dyn = CORR.DynamicEstimator(ws, oof_pool, corr_oof, day_vec_pool).fit(verbose=False)
-        if best_mae_dyn is None or dyn._oof_mae < best_mae_dyn:
-            best_mae_dyn, best_tau, best_ws, best_dyn = dyn._oof_mae, tau, ws, dyn
+        dyn = CORR.DynamicEstimator(ws, oof_pool, corr_oof, day_vec_pool,
+                                    fold_windows=fold_windows).fit(verbose=False)
+        # τ 亦按 minimax 最差折稳定性选（跨年泛化代理），平局取 OOF 均值更小者
+        if best_worst is None or dyn._oof_worst < best_worst - 1e-6 or (
+                abs(dyn._oof_worst - best_worst) <= 1e-6 and dyn._oof_mae < best_dyn._oof_mae):
+            best_worst, best_tau, best_ws, best_dyn = dyn._oof_worst, tau, ws, dyn
+    best_mae_dyn = best_dyn._oof_mae
     if verbose:
-        print(f"      τ grid 选 tau={best_tau}  动态修正 OOF MAE={best_mae_dyn:.2f}")
+        print(f"      τ grid 选 tau={best_tau}  动态修正 OOF MAE={best_mae_dyn:.2f}  最差折MAE={best_worst:.2f}")
         oof_base_mae = float(np.mean(np.abs(best_dyn.oof["base_A_oof"] - best_dyn.oof["actual"])))
         oof_trig_rate = float(np.mean(best_dyn._oof_final != best_dyn.oof["base_A_oof"]))
         print(f"      [dyn] trig_frac={best_dyn.trig_frac} min_gain={best_dyn.min_gain} "

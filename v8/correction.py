@@ -92,17 +92,35 @@ class DynamicEstimator:
     """
 
     def __init__(self, weather_sim, oof_pool: dict, corr_oof: np.ndarray,
-                 day_vec_pool: pd.DataFrame):
+                 day_vec_pool: pd.DataFrame, fold_windows=None):
         self.ws = weather_sim
         self.oof = oof_pool
         self.corr_oof = np.asarray(corr_oof, dtype=float)
         self.day_vec_pool = day_vec_pool
+        # 3 折 walk-forward 的 (te, vs, ve) 评估窗，用于 minimax 跨季稳定性选 trigger。
+        # 跨年泛化代理：要求 trigger 在每个季节折上都不恶化（max-fold MAE 最小），
+        # 而非平均 OOF MAE 最优（后者会为单季收益过拟合、跨年翻转 -> val 过度修正）。
+        # val 零参与（仅用 2025 训练期 3 折）。
+        self.fold_windows = fold_windows
         self.trig_frac = 0.6
         self.min_gain = 30.0
         self._oof_final = None
         self._oof_mae = None
+        self._oof_worst = None
         self._ds_table = None
         self._build_index()
+
+    def _fold_ids(self) -> np.ndarray:
+        """每个 OOF 池点所属的 walk-forward 折 id（按评估窗 vs..ve 归属）；无归属为 -1。"""
+        if not self.fold_windows:
+            return np.full(len(self.oof["idx"]), -1, dtype=int)
+        t = pd.DatetimeIndex(self.oof["times"])
+        fid = np.full(len(t), -1, dtype=int)
+        for k, fw in enumerate(self.fold_windows):
+            _, vs, ve = fw
+            m = (t >= pd.Timestamp(vs)) & (t <= pd.Timestamp(ve))
+            fid[m] = k
+        return fid
 
     def _build_index(self):
         d = defaultdict(list)
@@ -178,22 +196,43 @@ class DynamicEstimator:
         if verbose:
             n_trig = sum(1 for v in self._ds_table.values() if v["gain"] > 0)
             print(f"  [Dyn] (date,seg) 组={len(self._ds_table)}  gain>0={n_trig}")
-        # 2) grid search trig_frac/min_gain 使 OOF MAE 最优
-        best = None
-        for tf in VC.TRIG_FRAC_GRID:
-            for mg in VC.MIN_GAIN_GRID:
-                final = self._simulate(tf, mg)
-                mae = float(np.mean(np.abs(final - self.oof["actual"])))
-                if best is None or mae < best[0]:
-                    best = (mae, tf, mg)
-        self.trig_frac, self.min_gain = best[1], best[2]
-        self._oof_final = self._simulate(self.trig_frac, self.min_gain)
-        self._oof_mae = best[0]
+        # 2) grid search min_gain：minimax 跨季稳定性（max-fold MAE 最小），val 零参与。
+        #    trigger 可信度门槛 TRIG_MIN_FRAC 固定（跨年保守，见 config 注释），仅 grid 选 min_gain。
+        fid = self._fold_ids()
+        actual = self.oof["actual"]
+        use_minimax = self.fold_windows is not None and (fid >= 0).any()
+
+        def _grid_obj(final):
+            err = np.abs(final - actual)
+            if use_minimax:
+                folds = [k for k in range(len(self.fold_windows)) if (fid == k).any()]
+                worst = max(float(err[fid == k].mean()) for k in folds)
+                avg = float(err.mean())
+                return worst, avg
+            return float(err.mean()), float(err.mean())
+
+        best = None  # (worst, avg, mg)
+        for mg in VC.MIN_GAIN_GRID:
+            final = self._simulate(mg)
+            worst, avg = _grid_obj(final)
+            if best is None or worst < best[0] - 1e-6 or (abs(worst - best[0]) <= 1e-6 and avg < best[1]):
+                best = (worst, avg, mg)
+        self.min_gain = best[2]
+        self.trig_frac = VC.TRIG_MIN_FRAC  # 固定可信度门槛（记录用）
+        self._oof_final = self._simulate(self.min_gain)
+        self._oof_mae = float(np.mean(np.abs(self._oof_final - actual)))
+        if use_minimax:
+            folds = [k for k in range(len(self.fold_windows)) if (fid == k).any()]
+            err = np.abs(self._oof_final - actual)
+            self._oof_worst = max(float(err[fid == k].mean()) for k in folds)
+        else:
+            self._oof_worst = self._oof_mae
         if verbose:
             n_on = int(np.sum(self._oof_final != self.oof["base_A_oof"]))
-            base_mae = float(np.mean(np.abs(self.oof["base_A_oof"] - self.oof["actual"])))
-            print(f"  [Dyn] grid 选 trig_frac={self.trig_frac} min_gain={self.min_gain} "
-                  f"-> OOF MAE {base_mae:.2f}->{self._oof_mae:.2f} (Δ{self._oof_mae-base_mae:+.2f}, 修正点={n_on})")
+            base_mae = float(np.mean(np.abs(self.oof["base_A_oof"] - actual)))
+            print(f"  [Dyn] 可信度门槛 frac>={VC.TRIG_MIN_FRAC} grid 选 min_gain={self.min_gain} "
+                  f"(minimax) -> OOF MAE {base_mae:.2f}->{self._oof_mae:.2f} "
+                  f"(Δ{self._oof_mae-base_mae:+.2f}, OOF trigger命中率={n_on/len(actual):.3f})")
         return self
 
     def restore(self) -> "DynamicEstimator":
@@ -208,10 +247,15 @@ class DynamicEstimator:
             self._ds_table[(d, s)] = self._estimate_alpha_w_frac_gain(d, s)
         self._oof_final = self._simulate(self.trig_frac, self.min_gain)
         self._oof_mae = float(np.mean(np.abs(self._oof_final - self.oof["actual"])))
+        self._oof_worst = self._oof_mae  # 加载路径无 fold_windows（evaluate 不用此值）
         return self
 
-    def _simulate(self, tf: float, mg: float) -> np.ndarray:
-        """OOF 模拟：逐点用其 (date,seg) 的 α/w/trigger 应用 correction_OOF。"""
+    def _simulate(self, mg: float, tf: float | None = None) -> np.ndarray:
+        """OOF 模拟：逐点用其 (date,seg) 的 α/w/trigger 应用 correction_OOF。
+        trigger = frac >= tf（默认 TRIG_MIN_FRAC 固定门槛）且 gain >= mg。
+        tf 可显式传入（仅诊断扫描用，生产用默认）。"""
+        if tf is None:
+            tf = VC.TRIG_MIN_FRAC
         n = len(self.oof["idx"])
         final = self.oof["base_A_oof"].copy()
         for i in range(n):
@@ -222,11 +266,14 @@ class DynamicEstimator:
                 final[i] = self.oof["base_A_oof"][i] + e["w"] * e["alpha"] * self.corr_oof[i]
         return final
 
-    def params(self, d1_date, d1_seg, q_vec=None) -> tuple[float, float, bool]:
+    def params(self, d1_date, d1_seg, q_vec=None, tf: float | None = None) -> tuple[float, float, bool]:
         """部署时：对 D+1 (date,seg) 返回 (alpha, w, trigger)。
 
         q_vec：D+1 日级天气向量（调用方算好传入）。不传则回退查 day_vec_pool（仅训练期日期可用）。
+        tf：可信度门槛（默认 TRIG_MIN_FRAC，仅诊断扫描显式传入）。
         """
+        if tf is None:
+            tf = VC.TRIG_MIN_FRAC
         e = self._estimate_alpha_w_frac_gain(d1_date, d1_seg, q_vec=q_vec)
-        trig = (e["frac"] >= self.trig_frac) and (e["gain"] >= self.min_gain)
+        trig = (e["frac"] >= tf) and (e["gain"] >= self.min_gain)
         return e["alpha"], e["w"], trig

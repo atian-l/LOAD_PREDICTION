@@ -82,26 +82,30 @@ def weather_type(day_vec_row) -> str:
     return f"c{cb}_t{tb}"
 
 
-def adaptive_preference(oof_pool: dict, day_vec_pool: pd.DataFrame) -> dict[str, str]:
-    """OOF 池按天气型分桶比较 base A vs B 的 OOF MAE，返回 {天气型: 'A'|'B'}。
+def adaptive_preference(oof_pool: dict, day_vec_pool: pd.DataFrame) -> dict[tuple, str]:
+    """OOF 池按 (天气型, 段) 分桶比较 base A vs B 的 OOF MAE，返回 {(天气型, 段): 'A'|'B'}。
 
+    细化到段级：B 仅在其真正优于 A 的段被选用，避免"全日选 B"误伤夜间/晚间
+    （按日选 B 会把 B 的午间收益抵消在夜间/晚间损失上，实测 overall +0.43）。
     B 优 A 超过 ADAPTIVE_MIN_MARGIN 且桶样本≥ADAPTIVE_MIN_N 才偏好 B；否则 A（保守）。
-    天气型日级 + OOF 历史统计（非单日误差），避免偶然切换。
+    天气型日级 + OOF 历史统计（非单日误差），避免偶然切换；val 零参与。
     """
     dates = pd.DatetimeIndex(oof_pool["dates"]).normalize()
     types = np.array([weather_type(day_vec_pool.loc[d]) for d in dates], dtype=object)
+    segs = oof_pool["seg"]
     pref = {}
     for t in np.unique(types):
-        m = types == t
-        if int(m.sum()) < VC.ADAPTIVE_MIN_N:
-            pref[str(t)] = "A"
-            continue
-        mae_A = float(np.abs(oof_pool["base_A_oof"][m] - oof_pool["actual"][m]).mean())
-        mae_B = float(np.abs(oof_pool["base_B_oof"][m] - oof_pool["actual"][m]).mean())
-        pref[str(t)] = "B" if mae_B < mae_A * (1.0 - VC.ADAPTIVE_MIN_MARGIN) else "A"
+        for seg in VC.SEGMENTS:
+            m = (types == t) & (segs == seg)
+            if int(m.sum()) < VC.ADAPTIVE_MIN_N:
+                pref[(str(t), seg)] = "A"
+                continue
+            mae_A = float(np.abs(oof_pool["base_A_oof"][m] - oof_pool["actual"][m]).mean())
+            mae_B = float(np.abs(oof_pool["base_B_oof"][m] - oof_pool["actual"][m]).mean())
+            pref[(str(t), seg)] = "B" if mae_B < mae_A * (1.0 - VC.ADAPTIVE_MIN_MARGIN) else "A"
     return pref
 
 
-def select_base(d1_type: str, preference: dict) -> str:
-    """部署时选 base：查偏好表，默认 A。"""
-    return preference.get(d1_type, "A")
+def select_base(d1_type: str, d1_seg: str, preference: dict) -> str:
+    """部署时选 base：查 (天气型, 段) 偏好表，默认 A。"""
+    return preference.get((d1_type, d1_seg), "A")
