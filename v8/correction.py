@@ -112,12 +112,21 @@ class DynamicEstimator:
         self.pool_by_ds = {k: np.array(v) for k, v in d.items()}
         self.dates_norm = dates_norm
 
-    def _neighbor_points(self, q_date, seg) -> tuple[np.ndarray, np.ndarray]:
-        """对 (date, seg)，返回邻居 OOF 池点位置 + 归一化权重（排除当日防自泄露）。"""
+    def _neighbor_points(self, q_date, seg, q_vec=None) -> tuple[np.ndarray, np.ndarray]:
+        """对 (date, seg)，返回邻居 OOF 池点位置 + 归一化权重（排除当日防自泄露）。
+
+        q_vec：查询日的日级天气向量。OOF 模拟时不传（q_date 在训练池内，自查 day_vec_pool）；
+        部署/val 时由调用方传入（q_date 可能不在训练池内——如 2026 val 或 D+1 未来日，
+        此时 day_vec_pool.loc[q_date] 会 KeyError，旧实现静默返回空 -> trigger 永不命中，
+        val_trigger=0 的根因）。传 q_vec 后任意日期都能在训练池中找天气邻居，实现跨年迁移。
+        """
         q_date = pd.Timestamp(q_date).normalize()
-        if q_date not in self.day_vec_pool.index:
-            return np.array([], dtype=int), np.array([], dtype=float)
-        q = self.day_vec_pool.loc[q_date].values.astype(float)
+        if q_vec is None:
+            if q_date not in self.day_vec_pool.index:
+                return np.array([], dtype=int), np.array([], dtype=float)
+            q = self.day_vec_pool.loc[q_date].values.astype(float)
+        else:
+            q = np.asarray(q_vec, dtype=float)
         nb_idx, nb_w = self.ws.query(q, exclude_date=q_date)
         if len(nb_idx) == 0:
             return np.array([], dtype=int), np.array([], dtype=float)
@@ -140,9 +149,9 @@ class DynamicEstimator:
             return pts, np.ones(len(pts)) / len(pts)
         return pts, w / s
 
-    def _estimate_alpha_w_frac_gain(self, q_date, seg) -> dict:
-        """对 (date,seg) 估 α（grid）/w/frac/gain。"""
-        pts, w = self._neighbor_points(q_date, seg)
+    def _estimate_alpha_w_frac_gain(self, q_date, seg, q_vec=None) -> dict:
+        """对 (date,seg) 估 α（grid）/w/frac/gain。q_vec 透传给 _neighbor_points（部署/val 用）。"""
+        pts, w = self._neighbor_points(q_date, seg, q_vec=q_vec)
         if len(pts) == 0:
             return {"alpha": 0.0, "w": 0.0, "frac": 0.0, "gain": 0.0}
         base = self.oof["base_A_oof"][pts]
@@ -187,6 +196,20 @@ class DynamicEstimator:
                   f"-> OOF MAE {base_mae:.2f}->{self._oof_mae:.2f} (Δ{self._oof_mae-base_mae:+.2f}, 修正点={n_on})")
         return self
 
+    def restore(self) -> "DynamicEstimator":
+        """加载后重建 _ds_table + _oof_final（用已存 trig_frac/min_gain，不重新 grid search）。
+
+        fit() 的 _ds_table/_oof_final 不入存档；加载后须调用本方法才能让 evaluate 取到真实
+        OOF trigger 命中率（否则 _oof_final=None，`None != array` 会被广播成全 True -> 假 1.0）。
+        """
+        uniq = list(dict.fromkeys(zip(self.dates_norm, self.oof["seg"])))
+        self._ds_table = {}
+        for d, s in uniq:
+            self._ds_table[(d, s)] = self._estimate_alpha_w_frac_gain(d, s)
+        self._oof_final = self._simulate(self.trig_frac, self.min_gain)
+        self._oof_mae = float(np.mean(np.abs(self._oof_final - self.oof["actual"])))
+        return self
+
     def _simulate(self, tf: float, mg: float) -> np.ndarray:
         """OOF 模拟：逐点用其 (date,seg) 的 α/w/trigger 应用 correction_OOF。"""
         n = len(self.oof["idx"])
@@ -199,8 +222,11 @@ class DynamicEstimator:
                 final[i] = self.oof["base_A_oof"][i] + e["w"] * e["alpha"] * self.corr_oof[i]
         return final
 
-    def params(self, d1_date, d1_seg) -> tuple[float, float, bool]:
-        """部署时：对 D+1 (date,seg) 返回 (alpha, w, trigger)。"""
-        e = self._estimate_alpha_w_frac_gain(d1_date, d1_seg)
+    def params(self, d1_date, d1_seg, q_vec=None) -> tuple[float, float, bool]:
+        """部署时：对 D+1 (date,seg) 返回 (alpha, w, trigger)。
+
+        q_vec：D+1 日级天气向量（调用方算好传入）。不传则回退查 day_vec_pool（仅训练期日期可用）。
+        """
+        e = self._estimate_alpha_w_frac_gain(d1_date, d1_seg, q_vec=q_vec)
         trig = (e["frac"] >= self.trig_frac) and (e["gain"] >= self.min_gain)
         return e["alpha"], e["w"], trig

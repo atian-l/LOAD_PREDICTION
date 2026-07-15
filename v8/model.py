@@ -20,6 +20,7 @@ from . import segments as SEG
 from . import weather_sim as WS
 from . import base as BASE
 from . import correction as CORR
+from ._io import load_booster
 
 
 class V8Model:
@@ -83,10 +84,11 @@ class V8Model:
             X_seg = X.iloc[idx_seg][self.feat_cols]
             corr_seg = CORR.correction_predict(self.correction_models[seg], X_seg)
             dates_seg = dates[idx_seg]
-            # (date,seg) 参数缓存
+            # (date,seg) 参数缓存（传入当日天气向量 q_vec，使 val/未来日也能在训练池找邻居）
             ds_cache = {}
             for d in pd.DatetimeIndex(np.unique(dates_seg)).normalize():
-                ds_cache[d] = self.dynamic.params(d, seg)
+                q_vec = day_vec.loc[d].values if d in day_vec.index else None
+                ds_cache[d] = self.dynamic.params(d, seg, q_vec=q_vec)
             for j, d in enumerate(dates_seg):
                 d = pd.Timestamp(d).normalize()
                 sel = date_sel.get(d, "A")
@@ -168,12 +170,12 @@ class V8Model:
         base_B.drift_corr = [(n, np.asarray(b, dtype=float)) for n, b in dc_B]
         base_B.threshold_corr = [dict(tc) for tc in tc_B]
         for p in bundle["base_B_booster_paths"]:
-            base_B.members.append(lgb.Booster(model_file=p))
+            base_B.members.append(load_booster(p))
         base_B.member_residual = list(bundle["base_B_member_residual"])
 
         correction_models = {}
         for seg, paths in bundle["correction_booster_paths"].items():
-            correction_models[seg] = [lgb.Booster(model_file=p) for p in paths]
+            correction_models[seg] = [load_booster(p) for p in paths]
 
         ws = bundle["weather_sim"]
         oof_pool = bundle["oof_pool"]
@@ -184,6 +186,7 @@ class V8Model:
         dynamic = CORR.DynamicEstimator(ws, oof_pool, corr_oof, day_vec_pool)
         dynamic.trig_frac = bundle["trig_frac"]
         dynamic.min_gain = bundle["min_gain"]
+        dynamic.restore()  # 重建 _ds_table/_oof_final（evaluate 取真实 OOF trigger 命中率）
 
         return cls(
             feat_cols=bundle["feat_cols"], cfg=bundle["cfg"],

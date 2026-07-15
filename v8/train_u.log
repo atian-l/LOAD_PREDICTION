@@ -40,16 +40,4 @@ E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWa
 [6/8] adaptive model selection 偏好表（天气型分桶）...
       天气型桶=10  偏好 B 的桶=2  其余=A
 [7/8] 加载 base A（v6 根 bundle）+ 组装 V8Model + 保存 ...
-      已保存: E:\01\python\SdPproject\load_prediction\v8\models\v8_bundle.pkl
-[8/8] val 评估 ...
-
-================ v8 val 评估 ================
-  MAE: 1446.054954560492
-  RMSE: 2270.092080975749
-  Bias: -17.650080681589667
-  午间MAE(08-18): 2382.20546479725
-  大偏差点数(>3000): 1390
-  大偏差均值: 5089.638112413521
-  N_points: 10272
-  v7_MAE参考: 1445.62
-============================================
+[Li

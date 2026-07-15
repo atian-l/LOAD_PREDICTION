@@ -17,7 +17,9 @@ from load_pred.model import EnsembleModel
 
 from . import config as VC
 from . import model as VM
+from . import base as BASE
 from . import segments as SEG
+from . import weather_sim as WS
 
 
 def _mae(p, a):
@@ -57,10 +59,12 @@ def evaluate(verbose: bool = True) -> dict:
     vm = (times_eval >= val_start) & (times_eval <= val_end) & actual_eval.notna()
     hours_val = times_eval[vm].hour.values.astype(int)
 
-    # ---- v7 基线（根 model_bundle.pkl）----
+    # ---- v7 基线（根 model_bundle.pkl = v6）----
+    # 根 boosters 被 git autocrlf 污染（CRLF），EnsembleModel.load 解析失败；
+    # 用 BASE.load_base_A（CRLF->LF 规范化加载，等价 v6 完整模型）。
     if verbose:
         print("[1/3] v7 基线预测 ...")
-    v7 = EnsembleModel.load(LC.MODEL_BUNDLE)
+    v7 = BASE.load_base_A()
     X_v7 = v7.mismatch_model.transform(X_eval)
     v7_all = pd.Series(v7.predict_load(X_v7, pred_load), index=times_eval)
     v7_pred = v7_all[vm].values
@@ -83,15 +87,17 @@ def evaluate(verbose: bool = True) -> dict:
     oof_final = v8.dynamic._oof_final
     oof_base = v8.oof_pool["base_A_oof"]
     oof_trig_rate = float(np.mean(oof_final != oof_base))
-    # val trigger 命中率
+    # val trigger 命中率（传 q_vec：val 日期不在训练天气池内，须显式给查询向量才能找邻居）
     val_dates = pd.DatetimeIndex(times_eval[vm]).normalize()
     val_segs = SEG.segment_array(hours_val)
+    day_vec_eval = WS.day_weather_vectors(X_v7, times_eval)
     ds_cache = {}
     val_trig = np.zeros(len(val_dates), dtype=bool)
     for i, (d, s) in enumerate(zip(val_dates, val_segs)):
         key = (d, s)
         if key not in ds_cache:
-            ds_cache[key] = v8.dynamic.params(d, s)
+            q_vec = day_vec_eval.loc[d].values if d in day_vec_eval.index else None
+            ds_cache[key] = v8.dynamic.params(d, s, q_vec=q_vec)
         val_trig[i] = ds_cache[key][2]
     val_trig_rate = float(np.mean(val_trig))
 

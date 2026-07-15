@@ -76,6 +76,11 @@ def run_train(verbose: bool = True) -> dict:
             best_mae_dyn, best_tau, best_ws, best_dyn = dyn._oof_mae, tau, ws, dyn
     if verbose:
         print(f"      τ grid 选 tau={best_tau}  动态修正 OOF MAE={best_mae_dyn:.2f}")
+        oof_base_mae = float(np.mean(np.abs(best_dyn.oof["base_A_oof"] - best_dyn.oof["actual"])))
+        oof_trig_rate = float(np.mean(best_dyn._oof_final != best_dyn.oof["base_A_oof"]))
+        print(f"      [dyn] trig_frac={best_dyn.trig_frac} min_gain={best_dyn.min_gain} "
+              f"OOF base MAE={oof_base_mae:.2f} -> 动态={best_mae_dyn:.2f} "
+              f"(Δ{best_mae_dyn-oof_base_mae:+.2f}, OOF trigger命中率={oof_trig_rate:.3f})")
 
     # ---- 全量 correction model + base B ----
     if verbose:
