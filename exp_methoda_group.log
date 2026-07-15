@@ -18,3 +18,35 @@ E:\01\python\SdPproject\load_prediction\load_pred\features.py:349: PerformanceWa
   X["pl_dip_x_clear_sky"] = pl_dip_96 * clear_sky
 E:\01\python\SdPproject\load_prediction\load_pred\features.py:350: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
   X["pl_dip_ratio"] = pl_dip_96 / (clear_sky + 1.0)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "E:\01\python\SdPproject\load_prediction\load_pred\exp_methoda_group.py", line 205, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "E:\01\python\SdPproject\load_prediction\load_pred\exp_methoda_group.py", line 170, in main
+    val_b = np.average(raw_val_resid[mv])
+                       ~~~~~~~~~~~~~^^^^
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 10272 but size of corresponding boolean axis is 118176
+==========================================================================
+路线B B1: Method A 7组分组模型 + OOF迁移验证 (v6 baseline=1445.62)
+==========================================================================
+[1] 构建数据集 ...
+    特征数=126  训练点=75840  val点=10272
+    组规模(训练): 深夜00-05:18960 晨爬坡06-09:12640 上午10-11:6320 午间峰12-14:9480 午后15-17:9480 晚高峰18-21:12640 夜间下行22-23:6320
+
+[2] 每组训练全模型(40成员) + raw val 路由 ...
+           深夜00-05: 训练18960点 val2568点 raw组MAE=561.6  (17s)
+          晨爬坡06-09: 训练12640点 val1712点 raw组MAE=1908.1  (13s)
+           上午10-11: 训练6320点 val856点 raw组MAE=2991.7  (7s)
+          午间峰12-14: 训练9480点 val1284点 raw组MAE=3107.7  (10s)
+           午后15-17: 训练9480点 val1284点 raw组MAE=1728.1  (10s)
+          晚高峰18-21: 训练12640点 val1712点 raw组MAE=808.6  (12s)
+         夜间下行22-23: 训练6320点 val856点 raw组MAE=843.2  (6s)
+  --> Method A raw val MAE = 1517.22  (v6 raw~1512, v6校正1445.62)
+
+[3] OOF 3折每组子模型 + 收集 OOF 残差(估 hour_bias) ...
+    OOF 总点数=22947
+  --> Method A OOF校正后 val MAE = 1524.81  (Δv6 +79.19)
+
+[5] OOF/val 一致性诊断（每 slot OOF残差 vs val残差方向）:
