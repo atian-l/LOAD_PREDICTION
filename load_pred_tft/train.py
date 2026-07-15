@@ -114,7 +114,8 @@ def train_ensemble(times, X, pred_load, actual, usable, cfg, best_it, mos_model=
                           trim_frac=float(cfg.get("trim_frac", 0.2)),
                           mos_model=mos_model,
                           feat_mean=None, static_cols=static_cols,
-                          tft_config=tft_config, device=cfg.get("device", "auto"))
+                          tft_config=tft_config, feat_clip=cfg.get("feat_clip", 10.0),
+                          device=cfg.get("device", "auto"))
 
     n = 0
     feat_mean_shared = None

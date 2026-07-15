@@ -43,6 +43,7 @@ class EnsembleModel:
                  feat_std: np.ndarray | None = None,
                  static_cols: list | None = None,
                  tft_config: dict | None = None,
+                 feat_clip: float | None = 10.0,
                  device: str = "auto"):
         self.feature_cols = feature_cols
         self.shrinkage = float(shrinkage)
@@ -64,6 +65,7 @@ class EnsembleModel:
         # tft_config：重建 TFT 架构 {n_feat,n_static,hidden_size,num_heads,num_lstm_layers,
         # dropout,encoder_len,decoder_len}（load 时用）。
         self.tft_config = tft_config or {}
+        self.feat_clip = feat_clip  # 标准化空间 clip（与 train_tft 一致，防 train/serve skew）
         self.device = get_device(device)
         self.members: list[TFT] = []
         self.member_residual: list[bool] = []
@@ -102,7 +104,8 @@ class EnsembleModel:
         member_preds = np.empty((len(self.members), len(X)), dtype=float)
         for i, (tft, is_res) in enumerate(zip(self.members, self.member_residual)):
             raw = predict_tft(tft, X, self.feature_cols, self.static_cols,
-                              self.feat_mean, self.feat_std, self.device)  # [len(X)]
+                              self.feat_mean, self.feat_std, self.device,
+                              feat_clip=self.feat_clip)  # [len(X)]
             member_preds[i] = anchor + raw if is_res else raw
         ens = self._aggregate(member_preds)
         pred = anchor + self.shrinkage * (ens - anchor)
@@ -172,6 +175,7 @@ class EnsembleModel:
             "feat_std": None if self.feat_std is None else self.feat_std.tolist(),
             "static_cols": self.static_cols,
             "tft_config": self.tft_config,
+            "feat_clip": self.feat_clip,
             "device": "auto",
         }
         with open(path, "wb") as f:
@@ -206,6 +210,7 @@ class EnsembleModel:
                   feat_std=bundle.get("feat_std"),
                   static_cols=bundle.get("static_cols"),
                   tft_config=tft_config,
+                  feat_clip=bundle.get("feat_clip", 10.0),
                   device="auto")
         for p in bundle["booster_paths"]:
             tft = TFT(

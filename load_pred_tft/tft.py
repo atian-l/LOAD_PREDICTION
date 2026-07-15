@@ -264,10 +264,13 @@ def _standardize_fit(arr, mask):
     return mu, sd
 
 
-def _apply_std(arr, mu, sd):
+def _apply_std(arr, mu, sd, clip=None):
     a = np.asarray(arr, dtype=np.float64)
     a = np.where(np.isfinite(a), a, mu)  # NaN 填均值
-    return (a - mu) / sd
+    z = (a - mu) / sd
+    if clip is not None:                 # 标准化空间 clip（抗极端值；TFT LSTM/LayerNorm 数值稳定）
+        z = np.clip(z, -clip, clip)
+    return z
 
 
 # =========================================================================== #
@@ -315,7 +318,8 @@ def train_tft(X: pd.DataFrame, y: pd.Series, w_full: np.ndarray, usable: np.ndar
     # target 标准化用 usable 行
     y_mu, y_sd = _standardize_fit(y_arr, usable_rows)
     # 预构建标准化数组（full）
-    Xs = _apply_std(X_arr, feat_mean, feat_std)          # [T, n_feat]
+    feat_clip = cfg.get("feat_clip", 10.0)               # 标准化空间 clip（None=不clip；抗极端列防 LSTM 溢出 NaN）
+    Xs = _apply_std(X_arr, feat_mean, feat_std, clip=feat_clip)  # [T, n_feat]
     ys = (np.where(np.isfinite(y_arr), y_arr, y_mu) - y_mu) / y_sd  # [T]
 
     # ---- 构建样本张量 ----
@@ -376,8 +380,13 @@ def train_tft(X: pd.DataFrame, y: pd.Series, w_full: np.ndarray, usable: np.ndar
             total += loss.item() * len(idx)
         if scheduler is not None:
             scheduler.step()
-        if verbose and (ep % 5 == 0 or ep == epochs - 1):
-            print(f"      [TFT ep {ep+1}/{epochs}] loss={total/n:.4f}")
+        ep_loss = total / n
+        if verbose:
+            print(f"      [TFT ep {ep+1}/{epochs}] loss={ep_loss:.4f}")
+        if not np.isfinite(ep_loss):                 # 训练发散守卫：loss NaN/inf 早停（极端值致 LSTM 溢出）
+            if verbose:
+                print(f"      [TFT] loss 非有限 @ep {ep+1}，早停（训练发散）")
+            break
     model.eval()
     return model, feat_mean, feat_std
 
@@ -388,9 +397,11 @@ def train_tft(X: pd.DataFrame, y: pd.Series, w_full: np.ndarray, usable: np.ndar
 @torch.no_grad()
 def predict_tft(tft: TFT, X: pd.DataFrame, feat_cols: list, static_cols: list,
                 feat_mean: np.ndarray, feat_std: np.ndarray,
-                device, usable: np.ndarray | None = None) -> np.ndarray:
+                device, usable: np.ndarray | None = None,
+                feat_clip: float | None = 10.0) -> np.ndarray:
     """返回 full 长度的逐时刻预测（原始量纲，残差/直接空间）。
-    预测日段填值，前 encoder_len 段为 NaN。"""
+    预测日段填值，前 encoder_len 段为 NaN。
+    feat_clip 必须与训练时一致（防 train/serve skew；标准化空间 clip）。"""
     tft.eval()
     encoder_len = tft.encoder_len
     decoder_len = tft.decoder_len
@@ -398,7 +409,7 @@ def predict_tft(tft: TFT, X: pd.DataFrame, feat_cols: list, static_cols: list,
     n = len(times)
     X_arr = X[feat_cols].to_numpy(dtype=np.float64)
     static_arr = X[static_cols].to_numpy(dtype=np.float64)
-    Xs = _apply_std(X_arr, feat_mean, feat_std)
+    Xs = _apply_std(X_arr, feat_mean, feat_std, clip=feat_clip)
 
     out = np.full(n, np.nan, dtype=np.float64)
     # 预测日：从 encoder_len 到 n-dec，步 96，对齐日界
